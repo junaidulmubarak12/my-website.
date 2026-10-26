@@ -7,67 +7,83 @@
 <title>Kashmir Apple Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#eef2f3;--paper:#fff;--ink:#1c2b36;--mut:#566a76;--line:#d7e0e3;--apple:#b3262e;--onapple:#fff;--leaf:#3f6b3a;--ok:#e3efe0;--wait:#fbf0cf;--stop:#fbe3e1;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#f1f1ec;--card:#fafaf7;--ink:#1d2a24;--mut:#6b7872;--line:#e4e6df;--green:#17805a;--on:#fff;--orange:#f4a261;--tb:#d9eef1;--tp:#f6dcd8;--ok:#dff1e7;--wait:#fbefd2;--stop:#f9dedb;--sh:0 10px 28px rgba(40,55,45,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10181d;--paper:#17222a;--ink:#e6eef2;--mut:#9fb2bd;--line:#2a3a44;--apple:#ff8f89;--onapple:#2a0b0d;--leaf:#8cc787;--ok:#1b3322;--wait:#3a3216;--stop:#3d1d1e}}
-:root[data-theme="dark"]{--bg:#10181d;--paper:#17222a;--ink:#e6eef2;--mut:#9fb2bd;--line:#2a3a44;--apple:#ff8f89;--onapple:#2a0b0d;--leaf:#8cc787;--ok:#1b3322;--wait:#3a3216;--stop:#3d1d1e}
-body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Atkinson Hyperlegible",system-ui,"Segoe UI",Arial,sans-serif}
-h1,h2,h3{font-family:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;line-height:1.15;margin:0}
-h1{font-size:1.9rem}h2{font-size:1.5rem}h3{font-size:1.1rem}
-.top{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--paper);border-bottom:1px solid var(--line)}
-.top svg{width:30px;height:30px;flex:none}.top b{font:700 1.15rem "Bricolage Grotesque",system-ui,sans-serif}
-.top small{margin-left:auto;color:var(--mut);font-size:.8rem;text-align:right;line-height:1.2}
-main{max-width:760px;margin:0 auto;padding:20px 16px 100px}
-.m{color:var(--mut);margin:6px 0}
-.strip{position:relative;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:16px -16px 8px;padding:6px 16px 12px}
-.st{flex:0 0 136px;scroll-snap-align:center;border:0;background:none;padding:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
-.st img{width:136px;height:104px;object-fit:cover;border-radius:10px;display:block;outline:3px solid transparent;outline-offset:2px}
-.st.on img{outline-color:var(--apple)}
-.st span{display:block;font-size:.9rem;line-height:1.25;margin-top:7px}.st.on span{font-weight:700}
-.st i{font-style:normal;color:var(--mut);font-size:.8rem}
-.hero{border-radius:14px;overflow:hidden;background:var(--paper);border:1px solid var(--line)}
-.hero img{width:100%;height:auto;display:block}.hero .tx{padding:16px}
-.lead{font-size:1.08rem;margin:8px 0 0}
-.acts{display:grid;gap:10px;margin-top:16px}
-.btn{width:100%;min-height:48px;padding:10px 14px;border-radius:10px;border:2px solid var(--apple);background:var(--apple);color:var(--onapple);font:inherit;font-weight:700;cursor:pointer}
-.btn.alt{background:transparent;color:var(--apple)}
-.pn{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
-.pn button{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}
-.sec{margin-top:24px}.sec p{margin:6px 0 8px}
-.rw{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid var(--line)}
-.rw b{white-space:nowrap}.sec .rw:last-child{border-bottom:1px solid var(--line)}
-.call{border-left:5px solid var(--apple);background:var(--stop);padding:12px 14px;border-radius:0 10px 10px 0;margin-top:18px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101613;--card:#18211c;--ink:#e8efe9;--mut:#93a39a;--line:#26332c;--green:#3fc592;--on:#06261a;--tb:#1b3a40;--tp:#40262a;--ok:#1b3322;--wait:#3a3216;--stop:#3d1d1e;--sh:none}}
+:root[data-theme="dark"]{--bg:#101613;--card:#18211c;--ink:#e8efe9;--mut:#93a39a;--line:#26332c;--green:#3fc592;--on:#06261a;--tb:#1b3a40;--tp:#40262a;--ok:#1b3322;--wait:#3a3216;--stop:#3d1d1e;--sh:none}
+*,*:before,*:after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Plus Jakarta Sans",system-ui,"Segoe UI",Arial,sans-serif}
+main{max-width:720px;margin:0 auto;padding:18px 16px 120px}
+h1{font-size:1.7rem;font-weight:800;margin:0;line-height:1.15}h2{font-size:1.35rem;font-weight:800;margin:2px 0;line-height:1.2}h3{font-size:1.05rem;font-weight:800;margin:0 0 8px}
+.m{color:var(--mut);margin:4px 0;font-size:.92rem}
+.anim>*{animation:rise .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}}
+.card,.sec,.hero,details{background:var(--card);border-radius:24px;padding:18px;margin-top:14px;box-shadow:var(--sh)}
+.gr{display:flex;align-items:center;justify-content:space-between}
+.round{width:46px;height:46px;border-radius:50%;border:0;background:var(--card);box-shadow:var(--sh);display:grid;place-items:center;cursor:pointer}.round svg{width:26px;height:26px}
+.chips{position:relative;display:flex;gap:8px;overflow-x:auto;margin:16px -16px 0;padding:4px 16px 8px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;align-items:center;gap:8px;padding:5px 14px 5px 5px;border:0;border-radius:999px;background:var(--line);color:var(--ink);font:inherit;font-weight:600;cursor:pointer;transition:background .25s,transform .15s}
+.chip img{width:30px;height:30px;border-radius:50%;object-fit:cover}.chip.on{background:var(--orange);color:#2a1a08}
+.stage{padding:0;overflow:hidden}.stage img{width:100%;height:190px;object-fit:cover;display:block;animation:ph .7s ease both}
+@keyframes ph{from{opacity:0;transform:scale(1.06)}}
+.stage .tx,.hero .tx{padding:16px 18px 18px}.lead{margin:6px 0 14px}
+.hero{padding:0;overflow:hidden}.hero img{width:100%;height:auto;display:block}
+.btn{width:100%;min-height:50px;border:0;border-radius:999px;background:var(--green);color:var(--on);font:inherit;font-weight:700;cursor:pointer;transition:transform .15s}
+.btn.alt{background:transparent;color:var(--green);border:2px solid var(--green)}
+button:active{transform:scale(.97)}
+.wh{display:flex;gap:8px;flex-wrap:wrap}
+.pill{min-height:40px;width:auto;padding:0 14px;border-radius:999px;border:0;background:var(--line);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.pill.alt{background:transparent;border:2px solid var(--line)}
+.wt{display:flex;justify-content:space-between;align-items:center;margin:14px 0 6px}
+.big{font-size:2.8rem;font-weight:800;line-height:1}.wi{width:72px;height:72px}
+.mets{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;margin:10px 0}
+.mets div{display:flex;flex-direction:column;align-items:center;gap:2px}.mets b{font-size:.95rem}.mets span{color:var(--mut);font-size:.78rem}
+.mi{width:24px;height:24px;fill:none;stroke:var(--mut);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.sun{display:flex;flex-direction:column;align-items:center;margin-top:8px}.sun svg{width:100%;max-width:300px}
+.sun div{display:flex;justify-content:space-between;width:100%;max-width:300px;font-size:.85rem;color:var(--mut)}
+.arc{fill:none;stroke:var(--mut);stroke-width:1.6;stroke-dasharray:4 5}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.tile{border-radius:22px;padding:14px 12px;min-height:96px;display:flex;flex-direction:column;justify-content:space-between;color:#1d2a24}
+.tile b{font-size:2rem;font-weight:800;line-height:1}.tile>span{font-size:.82rem}
+.tile.g{background:#17805a;color:#fff}.tile.b{background:var(--tb);color:var(--ink)}.tile.p{background:var(--tp);color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr;gap:0}@media(min-width:560px){.two{grid-template-columns:1fr 1fr;gap:14px}}
+.ring{display:flex;align-items:center;gap:16px}.ring svg{width:110px;height:110px;flex:none}.ring b{display:block;font-size:1.8rem;font-weight:800}.ring span{color:var(--mut)}
+.rb{fill:none;stroke:var(--line);stroke-width:12}.rp{fill:none;stroke:var(--green);stroke-width:12;stroke-linecap:round;animation:ring 1.3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes ring{from{stroke-dashoffset:var(--full)}}
+.cyls{display:flex;justify-content:space-around;gap:6px;text-align:center}.cyls b{display:block;font-size:.95rem;margin-top:8px}.cyls span{color:var(--mut);font-size:.78rem}
+.cyl{position:relative;width:60px;height:100px;margin:0 auto;border-radius:18px/12px;overflow:hidden;background:linear-gradient(90deg,rgba(255,255,255,.5),rgba(255,255,255,.1) 45%,rgba(0,0,0,.05));border:1.5px solid var(--line)}
+.cyl i{position:absolute;left:0;right:0;bottom:0;height:var(--h);background:linear-gradient(90deg,#58b0d1,#2f80a8);animation:fill 1.2s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*140ms + 300ms)}
+@keyframes fill{from{height:0}}
+.cyl:after{content:"";position:absolute;top:0;left:0;right:0;height:16px;border-radius:50%;background:rgba(255,255,255,.35)}
+.sk{border-radius:16px;background:linear-gradient(90deg,var(--line) 25%,var(--card) 50%,var(--line) 75%);background-size:200% 100%;animation:sh 1.2s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.pn{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.pn button{min-height:44px;padding:0 16px;border-radius:999px;border:0;background:var(--card);box-shadow:var(--sh);color:var(--ink);font:inherit;font-weight:600;cursor:pointer}
+.sec p{margin:6px 0 8px}
+.rw{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-top:1px solid var(--line)}.rw b{white-space:nowrap}
+.call{border-radius:20px;background:var(--stop);padding:14px 16px;margin-top:14px}
 label{display:block;font-weight:700;margin:14px 0 4px}
-input,select,textarea{width:100%;min-height:48px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--paper);color:var(--ink)}
-.wnow{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:16px}
-.wnow .big{font:700 2.2rem "Bricolage Grotesque",system-ui,sans-serif;line-height:1.1;margin-top:4px}.wnow .big span{font:400 1.05rem "Atkinson Hyperlegible",system-ui,sans-serif;color:var(--mut)}
-.verdict{padding:16px;border-radius:12px;margin:18px 0 6px}
-.go{background:var(--ok)}.wait{background:var(--wait)}.stop{background:var(--stop)}
-.why{padding:11px 0;border-top:1px solid var(--line)}
+input,select,textarea{width:100%;min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;font:inherit;background:var(--bg);color:var(--ink)}
+.verdict{padding:18px;border-radius:24px;margin-top:14px}.go{background:var(--ok)}.wait{background:var(--wait)}.stop{background:var(--stop)}
+.why{padding:11px 4px;border-top:1px solid var(--line)}
 .ent{padding:14px 0;border-top:1px solid var(--line)}
-.x{margin-top:8px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--apple);background:none;color:var(--apple);font:inherit;cursor:pointer}
-details{border-top:1px solid var(--line);padding:12px 0}summary{cursor:pointer;font-weight:700}
-table{width:100%;border-collapse:collapse;margin-top:8px}td{padding:7px 0;border-top:1px solid var(--line)}td+td{text-align:right;font-weight:700}
+.x{margin-top:8px;min-height:40px;padding:0 16px;border-radius:999px;border:2px solid #c0392b;background:none;color:#c0392b;font:inherit;font-weight:600;cursor:pointer}
+summary{cursor:pointer;font-weight:700}table{width:100%;border-collapse:collapse;margin-top:8px}td{padding:7px 0;border-top:1px solid var(--line)}td+td{text-align:right;font-weight:700}
 ul{padding-left:20px;margin:8px 0}li{margin:5px 0}
-.foot{margin-top:34px;color:var(--mut);font-size:.85rem}
-.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--paper);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
-.tabs button{flex:1;border:0;background:none;color:var(--mut);font:inherit;font-size:.78rem;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;cursor:pointer}
-.tabs button.on{color:var(--apple);font-weight:700}
-.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.foot{margin-top:30px;color:var(--mut);font-size:.82rem}
+.tabs{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));max-width:520px;margin:0 auto;display:flex;background:var(--card);border-radius:28px;box-shadow:0 12px 32px rgba(30,45,38,.18);padding:8px 6px}
+.tabs button{flex:1;border:0;background:none;color:var(--mut);font:inherit;font-size:.74rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;cursor:pointer;transition:color .2s}
+.tabs button.on{color:var(--green)}.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s}.tabs button.on svg{transform:translateY(-2px) scale(1.12)}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #f0b429;outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<header class="top">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8c-1.500-1.600-6-1.400-6 4.200 0 3.700 2.600 7.800 4.600 7.800.9 0 1.100-.5 1.400-.5s.5.5 1.400.5c2 0 4.600-4.100 4.600-7.800C18 6.600 13.500 6.400 12 8z" fill="var(--apple)"/><path d="M12 8c0-2 1-3.500 3-4" stroke="var(--leaf)" stroke-width="1.800" fill="none" stroke-linecap="round"/></svg>
-  <b>Kashmir Apple Guide</b><small>Based on the SKUAST-K<br>guide, 2026</small>
-</header>
 <main id="v"></main>
 <nav class="tabs" id="tabs" aria-label="Sections"></nav>
-
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
@@ -95,7 +111,7 @@ const PHI={hexaconazole:10,fluxapyroxad:14,difenoconazole:15,pyraclostrobin:25,z
 
 const KEY=["Apply horticultural mineral oil before green tip. No fungicide yet.","Spray a fungicide only before rain. If the next 7 days are dry, skip it.","Same rule as green tip: spray before rain, and skip it if the next 7 days are dry.","The key stage for primary scab. Spray when most flowers are at pink stage.","Do not spray during flowering. One exception: 10 days since the last fungicide and rain is forecast.","Spray a fungicide before rains, and remove scab-infected leaves.","Spray before rains. Remove scab-infected fruits.","Spray a fungicide if rain is forecast. Treat mites only above 10 per leaf.","Spray a fungicide if rain is forecast. Check roots and collar for rot.","Spray before rains, but not in wet and hot weather.","Spray only if scab, Alternaria leaf blotch, sooty blotch or fly speck is present.","Check the waiting periods first. Some listed fungicides need more days than the guide’s spray window.","No sprays. Check that the fruit is mature.","Collect fallen leaves. Spray urea when half the leaves turn yellow in scab orchards.","No sprays. Prune, paste the wounds and keep the orchard clean."];
 const IC={stage:'<path d="M12 3c-4 3-6 6-6 9a6 6 0 0 0 12 0c0-3-2-6-6-9z"/><path d="M12 9v9"/>',spr:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',wx:'<path d="M7 18a4 4 0 0 1 0-8 5 5 0 0 1 9.600-1A4.500 4.500 0 0 1 17 18H7z"/>',dia:'<path d="M6 3h11a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6z"/><path d="M9 3v18M12 8h4"/>',learn:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.500v.5"/>'};
-const TABS=[["stage","Stage"],["spr","Sprays"],["wx","Weather"],["dia","Diary"],["learn","Learn"]];
+const TABS=[["stage","Home"],["spr","Sprays"],["wx","Weather"],["dia","Diary"],["learn","Learn"]];
 let tab="stage",cur=4;
 try{cur=+localStorage.getItem("apple-stage")||4}catch(e){}
 const setCur=n=>{cur=n;try{localStorage.setItem("apple-stage",n)}catch(e){}};
@@ -104,12 +120,27 @@ const rowH=x=>{x=x.trim();const m=x.match(/^(.*?)\s*\(([^()]*)\)$/);return m&&m[
 const list=s=>s?s.split("|").map(rowH).join(""):"";
 const sec=(h,n,l)=>(n||l)?`<div class="sec"><h3>${h}</h3>${n?`<p>${esc(n)}</p>`:""}${list(l)}</div>`:"";
 
+
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let ANIM=true,LOAD=false,ERR=false;
+const LOGO=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8c-1.5-1.6-6-1.4-6 4.2 0 3.7 2.6 7.8 4.6 7.8.9 0 1.1-.5 1.4-.5s.5.5 1.4.5c2 0 4.6-4.1 4.6-7.8C18 6.6 13.5 6.4 12 8z" fill="#b3262e"/><path d="M12 8c0-2 1-3.5 3-4" stroke="#3f8f4a" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>`;
+const mi=p=>`<svg class="mi" viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
+const ICO={hum:mi('<path d="M12 3c-4 4.5-6 7.5-6 10a6 6 0 0 0 12 0c0-2.5-2-5.5-6-10z"/>'),wind:mi('<path d="M3 9h11a3 3 0 1 0-3-3M3 14h15a3 3 0 1 1-3 3M3 19h7"/>'),rain:mi('<path d="M7 14a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1A4.5 4.5 0 0 1 17 14H7zM9 17v3M13 17v3M17 17v3"/>'),next:mi('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')};
+const greet=()=>{const h=new Date().getHours();return h<12?"Good morning":h<17?"Good afternoon":"Good evening"};
+const wicon=c=>c===0?`<svg viewBox="0 0 48 48" class="wi"><circle cx="24" cy="24" r="9" fill="#f4a261"/><path d="M24 5v5M24 38v5M5 24h5M38 24h5M11 11l3 3M34 34l3 3M37 11l-3 3M14 34l-3 3" stroke="#f4a261" stroke-width="3" stroke-linecap="round"/></svg>`
+ :`<svg viewBox="0 0 48 48" class="wi"><circle cx="35" cy="14" r="7" fill="#f4a261"${c>3?' opacity="0"':""}/><path d="M13 36h21a7 7 0 0 0 0-14 10 10 0 0 0-19-2 8 8 0 0 0-2 16z" fill="var(--card)" stroke="var(--mut)" stroke-width="2.5" stroke-linejoin="round"/>${c>=51?'<path d="M18 40l-2 5M26 40l-2 5M34 40l-2 5" stroke="#3b8fb0" stroke-width="3" stroke-linecap="round"/>':""}</svg>`;
+
 function homeView(){
   const s=ST[cur-1];
-  return `<h1>Where are your trees today?</h1><p class="m">Pick the stage that looks like your trees. Apne ped ka stage chunein.</p>
-  <div class="strip" id="strip">${ST.map(x=>`<button class="st${x.n===cur?" on":""}" data-s="${x.n}"><img src="${IMG[x.n]}" alt=""><span>${esc(x.t)}<br><i>Stage ${x.n}</i></span></button>`).join("")}</div>
-  <div class="hero"><img src="${IMG[s.n]}" alt="${esc(s.t)}"><div class="tx"><h2>${esc(s.t)}</h2><p class="lead">${esc(KEY[cur-1])}</p>
-  <div class="acts"><button class="btn" data-g="spr">See sprays and doses</button><button class="btn alt" data-g="wx">Check the weather</button><button class="btn alt" data-g="dia">Log a spray</button></div></div></div>`;
+  return `<div class="gr"><div><span class="m">${greet()}</span><h1>Assalamu alaikum</h1></div><button class="round" data-g="learn" aria-label="Safety notes and about">${LOGO}</button></div>
+  <div class="chips" id="strip">${ST.map(x=>`<button class="chip${x.n===cur?" on":""}" data-s="${x.n}"><img src="${IMG[x.n]}" alt="">${esc(x.t)}</button>`).join("")}</div>
+  <div class="card stage"><img src="${IMG[s.n]}" alt="${esc(s.t)}"><div class="tx"><span class="m">Stage ${s.n} of 15</span><h2>${esc(s.t)}</h2><p class="lead">${esc(KEY[cur-1])}</p><button class="btn" data-g="spr">See sprays and doses</button></div></div>
+  <div class="card" id="wcard"></div><div class="tiles" id="htiles"></div>
+  <div class="two"><div class="card" id="hring">${ringHTML()}</div><div class="card" id="hrain"></div></div>`;
+}
+function ringHTML(){
+  const C=2*Math.PI*48;
+  return `<h3>Season</h3><div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="48" class="rb"/><circle cx="60" cy="60" r="48" class="rp" transform="rotate(-90 60 60)" style="--full:${C.toFixed(1)};stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${(C*(1-cur/15)).toFixed(1)}"/></svg><div><b>${cur}/15</b><span>${esc(ST[cur-1].t)}</span></div></div>`;
 }
 
 function sprView(){
@@ -122,6 +153,7 @@ function sprView(){
   ${s.f||s.i||s.m?`<p class="m">All doses are per 100 litres of water. Use one product from a list, and never repeat the same pesticide in two sprays in a row.</p>`:`<p class="m">The guide lists no fungicide or insecticide for this stage.</p>`}`;
 }
 
+
 const PL={"Srinagar":[34.084,74.797],"Anantnag":[33.731,75.149],"Baramulla":[34.198,74.364],"Sopore":[34.3,74.47],"Shopian":[33.717,74.83],"Pulwama":[33.874,74.9],"Kulgam":[33.64,75.02],"Kupwara":[34.526,74.256],"Budgam":[34.02,74.72],"Ganderbal":[34.23,74.77],"Bandipora":[34.42,74.65]};
 let PLACE=null,WX=null;
 try{PLACE=JSON.parse(localStorage.getItem("apple-place"))}catch(e){}
@@ -129,58 +161,18 @@ const setPlace=p=>{PLACE=p;try{localStorage.setItem("apple-place",JSON.stringify
 
 function wxView(){
   return `<h1>Weather check</h1><p class="m">Live weather for your orchard. Mausam dekh kar faisla.</p>
-  <label for="wp">Your place</label><select id="wp"><option value="">Choose a place</option>${Object.keys(PL).map(k=>`<option${PLACE&&PLACE.name===k?" selected":""}>${k}</option>`).join("")}</select>
-  <button class="btn alt" style="margin-top:10px" data-a="gps">Use my phone’s location</button>
-  <div id="wnow">${PLACE?"":`<p class="m">Choose a place to see the weather now and the forecast for the next 7 days.</p>`}</div>
-  <h3 style="margin-top:24px">Your answers</h3><p class="m">Filled in from the forecast when a place is chosen. You can change any answer.</p>
+  <div class="card" id="wcard"></div>
+  <div class="sec"><h3>Your answers</h3><p class="m">Filled in from the forecast when a place is chosen. You can change any answer.</p>
   <label for="ws">Stage of your trees</label><select id="ws">${ST.map(s=>`<option value="${s.n}"${s.n===cur?" selected":""}>Stage ${s.n}: ${esc(s.t)}</option>`).join("")}</select>
   <label for="wr">Rain forecast</label><select id="wr"><option value="now">Rain within 24 hours</option><option value="week">Rain later this week</option><option value="dry">Dry for the next 7 days</option></select>
   <label for="wh">Is it very hot now?</label><select id="wh"><option value="0">No</option><option value="1">Yes, high temperature</option></select>
   <label for="ww">Is it raining, or are the leaves wet?</label><select id="ww"><option value="0">No</option><option value="1">Yes</option></select>
-  <label for="wg">Days since your last fungicide spray</label><input id="wg" type="number" min="0" value="7">
+  <label for="wg">Days since your last fungicide spray</label><input id="wg" type="number" min="0" value="7"></div>
   <div id="wo"></div>`;
 }
 
-function ensureWx(){
-  if(!PLACE)return;
-  if(WX&&WX.k===PLACE.lat+","+PLACE.lon&&Date.now()-WX.t<6e5)showWx();else loadWx();
-}
-async function loadWx(){
-  if($("wnow"))$("wnow").innerHTML=`<p class="m">Loading the forecast…</p>`;
-  try{
-    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${PLACE.lat}&longitude=${PLACE.lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=precipitation&daily=precipitation_sum,temperature_2m_max&forecast_days=7&timezone=auto`);
-    if(!r.ok)throw new Error("bad response");
-    WX={j:await r.json(),k:PLACE.lat+","+PLACE.lon,t:Date.now()};
-    if(tab==="wx")showWx();
-  }catch(e){
-    if($("wnow"))$("wnow").innerHTML=`<div class="call">The forecast could not be loaded. Check your internet connection and try again, or answer the questions below yourself.</div>`;
-  }
-}
-function showWx(){
-  const el=$("wnow");if(!el||!WX)return;
-  const j=WX.j,c=j.current,h=j.hourly,d=j.daily;
-  let i=h.time.findIndex(t=>t>=c.time.slice(0,13)+":00");if(i<0)i=0;
-  const n24=h.precipitation.slice(i,i+24).reduce((a,b)=>a+(b||0),0),code=c.weather_code;
-  const cond=code===0?"Clear":code<=3?"Partly cloudy":code<=48?"Fog":code<=57?"Drizzle":code<=67?"Rain":code<=77?"Snow":code<=82?"Rain showers":code<=86?"Snow showers":"Thunderstorm";
-  const wetNow=(c.precipitation||0)>0||(code>=51&&code<=67)||(code>=80&&code<=82)||code>=95;
-  $("wr").value=n24>=1?"now":d.precipitation_sum.some(x=>x>=1)?"week":"dry";
-  $("wh").value=c.temperature_2m>=30?"1":"0";
-  $("ww").value=wetNow?"1":"0";
-  el.innerHTML=`<div class="wnow"><b>${esc(PLACE.name)}, now</b><div class="big">${Math.round(c.temperature_2m)}°C <span>${cond}</span></div>
-  <p class="m">Humidity ${c.relative_humidity_2m}%, wind ${Math.round(c.wind_speed_10m)} km/h. Rain in the next 24 hours: ${n24.toFixed(1)} mm.</p>
-  ${d.time.map((t,k)=>`<div class="rw"><span>${new Date(t+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}</span><b>${(d.precipitation_sum[k]||0).toFixed(1)} mm rain, high ${Math.round(d.temperature_2m_max[k])}°C</b></div>`).join("")}
-  <p class="m">Rain of 1 mm or more counts as rain. The guide gives no number for heat, so this page treats 30°C or more as hot.</p></div>`;
-  calcW();
-}
-function gps(){
-  if(!navigator.geolocation){alert("This phone does not share its location. Choose a place from the list.");return}
-  navigator.geolocation.getCurrentPosition(p=>{setPlace({name:"Your location",lat:+p.coords.latitude.toFixed(3),lon:+p.coords.longitude.toFixed(3)});render()},
-    ()=>alert("Could not get your location. Allow location access, or choose a place from the list."),{timeout:15000});
-}
-
-function calcW(){
-  const s=+$("ws").value,rain=$("wr").value!=="dry",hot=$("wh").value==="1",wet=$("ww").value==="1",gap=+$("wg").value||0,o=[];
-  const add=(c,m)=>o.push([c,m]);
+function advise(s,rain,hot,wet,gap){
+  const o=[],add=(c,m)=>o.push([c,m]);
   if(s===5)rain&&gap>=10?add("wait","Flowering: spraying is not advisable. The guide allows a fungicide only if 10 days have passed since the last one and rain is forecast. Spray in mist form."):add("stop","Flowering: do not spray. Spraying is not advisable during flowering.");
   else if(s===2||s===3)rain?add("go","Rain is coming. Spray a listed fungicide before the rain starts."):add("stop","Dry for 7 days. The guide says do not spray fungicide now.");
   else if(s===4)rain?add("go","Spray a listed fungicide before the rain. This is the key stage for primary scab."):add("wait","Dry weather. Spray when most flowers are at pink stage, not in early flowering.");
@@ -191,9 +183,84 @@ function calcW(){
   if(hot)add("wait","High temperature: do not spray in the heat. Spray in the early morning or evening.");
   if(wet)add("wait","Rainy or wet weather: avoid spraying. It can burn the leaves, especially in Stage 10.");
   add("wait","If heavy rain falls within 12 hours after spraying, repeat the spray (when no sticker or adjuvant was used). Never spray in full bloom.");
+  return [o.some(x=>x[0]==="stop")?"stop":o.some(x=>x[0]==="go")?"go":"wait",o];
+}
+function calcW(){
+  const [w,o]=advise(+$("ws").value,$("wr").value!=="dry",$("wh").value==="1",$("ww").value==="1",+$("wg").value||0);
   const T={go:"Spray before the rain",wait:"Wait and check",stop:"Do not spray"},H={go:"Rain se pehle spray karein",wait:"Ruk kar dekhein",stop:"Spray na karein"};
-  const w=o.some(x=>x[0]==="stop")?"stop":o.some(x=>x[0]==="go")?"go":"wait";
-  $("wo").innerHTML=`<div class="verdict ${w}"><h2>${T[w]}</h2><p class="m">${H[w]}</p></div>`+o.map(x=>`<div class="why">${esc(x[1])}</div>`).join("");
+  $("wo").innerHTML=`<div class="verdict ${w}"><h2>${T[w]}</h2><p class="m">${H[w]}</p></div><div class="sec">${o.map(x=>`<div class="why">${esc(x[1])}</div>`).join("")}</div>`;
+}
+
+function wxIn(w){
+  const c=w.current,h=w.hourly,d=w.daily,code=c.weather_code;
+  let i=h.time.findIndex(t=>t>=c.time.slice(0,13)+":00");if(i<0)i=0;
+  const n24=h.precipitation.slice(i,i+24).reduce((a,b)=>a+(b||0),0);
+  return{n24,rain:n24>=1?"now":d.precipitation_sum.some(x=>x>=1)?"week":"dry",hot:c.temperature_2m>=30,
+    wet:(c.precipitation||0)>0||(code>=51&&code<=67)||(code>=80&&code<=82)||code>=95,
+    cond:code===0?"Clear":code<=3?"Partly cloudy":code<=48?"Fog":code<=57?"Drizzle":code<=67?"Rain":code<=77?"Snow":code<=82?"Rain showers":code<=86?"Snow showers":"Thunderstorm"};
+}
+const tm=t=>new Date(t).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"});
+
+function wcardHTML(w){
+  const head=`<div class="wh"><select id="wp" class="pill" aria-label="Your place"><option value="">Choose a place</option>${Object.keys(PL).map(k=>`<option${PLACE&&PLACE.name===k?" selected":""}>${k}</option>`).join("")}${PLACE&&!PL[PLACE.name]?`<option selected>${esc(PLACE.name)}</option>`:""}</select><button class="pill alt" data-a="gps">Use my location</button></div>`;
+  if(!PLACE)return head+`<p class="m" style="margin-top:12px">Choose a place to see the weather now and the forecast for the next 7 days.</p>`;
+  if(!w)return head+(ERR?`<p class="m" style="margin-top:12px">The forecast could not be loaded. Check your internet connection and try again.</p>`:`<div class="sk" style="height:84px;margin-top:14px"></div><div class="sk" style="height:56px;margin-top:10px"></div>`);
+  const c=w.current,d=w.daily,x=wxIn(w),t=Math.round(c.temperature_2m);
+  const sr=new Date(d.sunrise[0]),ss=new Date(d.sunset[0]),f=Math.max(0,Math.min(1,(new Date(c.time)-sr)/(ss-sr))),g=1-f;
+  const px=g*g*12+2*g*f*100+f*f*188,py=g*g*72+2*g*f*-30+f*f*72,P="M12 72Q100-30 188 72";
+  const sun=RM?`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="#f4a261"/>`:`<circle r="7" fill="#f4a261"><animateMotion path="${P}" keyPoints="0;${f.toFixed(3)}" keyTimes="0;1" calcMode="linear" dur="1.8s" fill="freeze"/></circle>`;
+  return head+`<div class="wt"><div><div class="big"><span data-count="${t}">${t}</span>°C</div><div class="m">${x.cond}</div></div>${wicon(c.weather_code)}</div>
+  <div class="mets">${[[ICO.hum,c.relative_humidity_2m+"%","Humidity"],[ICO.wind,Math.round(c.wind_speed_10m)+" km/h","Wind"],[ICO.rain,(c.precipitation||0)+" mm","Rain now"],[ICO.next,x.n24.toFixed(1)+" mm","Next 24 h"]].map(m=>`<div>${m[0]}<b>${m[1]}</b><span>${m[2]}</span></div>`).join("")}</div>
+  <div class="sun"><svg viewBox="0 0 200 84" aria-hidden="true"><path class="arc" d="${P}"/>${sun}</svg><div><span>Sunrise ${tm(d.sunrise[0])}</span><span>Sunset ${tm(d.sunset[0])}</span></div></div>
+  ${tab==="wx"?d.time.map((q,k)=>`<div class="rw"><span>${new Date(q+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}</span><b>${(d.precipitation_sum[k]||0).toFixed(1)} mm rain, high ${Math.round(d.temperature_2m_max[k])}°C</b></div>`).join("")+`<p class="m">Rain of 1 mm or more counts as rain. The guide gives no number for heat, so this page treats 30°C or more as hot.</p>`:""}`;
+}
+function tilesHTML(w){
+  const x=w&&wxIn(w);let v="–",lab="Choose a place";
+  if(x){v={go:"Go",wait:"Wait",stop:"Stop"}[advise(cur,x.rain!=="dry",x.hot,x.wet,7)[0]];lab="Spray advice"}
+  return `<div class="tile g"><b>${v}</b><span>${lab}</span></div>
+  <div class="tile b"><b>${x?`<span data-count="${x.n24.toFixed(1)}" data-dec="1">${x.n24.toFixed(1)}</span>`:"–"}</b><span>mm in 24 h</span></div>
+  <div class="tile p"><b><span data-count="${cur}">${cur}</span>/15</b><span>Spray stage</span></div>`;
+}
+function rainHTML(w){
+  if(!w)return `<h3>Rain, next 3 days</h3><p class="m">Choose a place to see the forecast.</p>`;
+  const d=w.daily;
+  return `<h3>Rain, next 3 days</h3><div class="cyls">${[0,1,2].map(i=>{const mm=d.precipitation_sum[i]||0,lab=mm<1?"Dry":mm<5?"Light":mm<10?"Moderate":"Heavy";
+    return `<div><div class="cyl" style="--i:${i};--h:${mm>0?Math.max(6,Math.min(100,mm*10)):0}%"><i></i></div><b>${mm.toFixed(1)} mm</b><span>${i?new Date(d.time[i]+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short"}):"Today"}, ${lab}</span></div>`}).join("")}</div>`;
+}
+function fillWx(){
+  const w=WX&&PLACE&&WX.k===PLACE.lat+","+PLACE.lon?WX.j:null;
+  if($("wcard"))$("wcard").innerHTML=wcardHTML(w);
+  if($("htiles"))$("htiles").innerHTML=tilesHTML(w);
+  if($("hrain"))$("hrain").innerHTML=rainHTML(w);
+  if(w&&$("wr")){const x=wxIn(w);$("wr").value=x.rain;$("wh").value=x.hot?"1":"0";$("ww").value=x.wet?"1":"0"}
+  if($("wo"))calcW();
+  counts();
+}
+function ensureWx(){
+  if(!PLACE)return;
+  if(!(WX&&WX.k===PLACE.lat+","+PLACE.lon&&Date.now()-WX.t<6e5))loadWx();
+}
+async function loadWx(){
+  const p=PLACE;LOAD=true;ERR=false;fillWx();
+  try{
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=precipitation&daily=precipitation_sum,temperature_2m_max,sunrise,sunset&forecast_days=7&timezone=auto`);
+    if(!r.ok)throw new Error("bad response");
+    WX={j:await r.json(),k:p.lat+","+p.lon,t:Date.now()};
+  }catch(e){ERR=true}
+  LOAD=false;fillWx();
+}
+function gps(){
+  if(!navigator.geolocation){alert("This phone does not share its location. Choose a place from the list.");return}
+  navigator.geolocation.getCurrentPosition(p=>{setPlace({name:"Your location",lat:+p.coords.latitude.toFixed(3),lon:+p.coords.longitude.toFixed(3)});render()},
+    ()=>alert("Could not get your location. Allow location access, or choose a place from the list."),{timeout:15000});
+}
+function counts(){
+  document.querySelectorAll("[data-count]").forEach(el=>{
+    const t=+el.dataset.count,d=+el.dataset.dec||0;
+    if(RM)return;
+    const t0=performance.now(),step=n=>{const k=Math.min(1,(n-t0)/900);el.textContent=(t*(1-Math.pow(1-k,3))).toFixed(d);if(k<1)requestAnimationFrame(step)};
+    requestAnimationFrame(step);
+  });
 }
 
 let D=[];try{D=JSON.parse(localStorage.getItem("apple-diary-v1"))||[]}catch(e){}
@@ -253,11 +320,14 @@ function learnView(){
 
 const FOOT=`<p class="foot">Photos and spray guidance: SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026. This page repeats the guide and may contain copying errors. Check the original and ask a Plant Protection officer before you spray. Use and sale of products depend on CIB &amp; RC registration and label claim.</p>`;
 
+
 function render(){
   $("tabs").innerHTML=TABS.map(t=>`<button class="${t[0]===tab?"on":""}" data-tab="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[t[0]]}</svg>${t[1]}</button>`).join("");
-  $("v").innerHTML=({stage:homeView,spr:sprView,wx:wxView,dia:diaView,learn:learnView}[tab])()+FOOT;
-  if(tab==="wx"){calcW();ensureWx()}
-  const on=document.querySelector(".st.on"),sp=$("strip");
+  const v=$("v");v.className=ANIM?"anim":"";
+  v.innerHTML=({stage:homeView,spr:sprView,wx:wxView,dia:diaView,learn:learnView}[tab])()+FOOT;
+  [...v.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,8)));
+  if(tab==="stage"||tab==="wx"){fillWx();ensureWx()}
+  const on=document.querySelector(".chip.on"),sp=$("strip");
   if(on&&sp)sp.scrollLeft=on.offsetLeft-sp.clientWidth/2+on.clientWidth/2;
 }
 
@@ -265,8 +335,9 @@ document.addEventListener("click",e=>{
   const t=e.target.closest("[data-tab],[data-s],[data-g],[data-a]");
   if(!t)return;
   const d=t.dataset;
+  ANIM=!!(d.tab||d.g);
   if(d.tab||d.g){tab=d.tab||d.g;window.scrollTo(0,0)}
-  else if(d.s){setCur(+d.s);if(tab==="spr")window.scrollTo(0,0)}
+  else if(d.s){setCur(+d.s);if(tab==="spr"){ANIM=true;window.scrollTo(0,0)}}
   else if(d.a==="gps"){gps();return}
   else if(d.a==="add"){
     const p=$("dp").value.trim();
@@ -278,8 +349,8 @@ document.addEventListener("click",e=>{
   }
   render();
 });
-document.addEventListener("input",e=>{if(e.target.id==="ws")setCur(+e.target.value);if(tab==="wx")calcW()});
-document.addEventListener("change",e=>{if(e.target.id==="wp"&&PL[e.target.value]){setPlace({name:e.target.value,lat:PL[e.target.value][0],lon:PL[e.target.value][1]});render()}});
+document.addEventListener("input",e=>{if(e.target.id==="ws")setCur(+e.target.value);if(tab==="wx"&&$("wo"))calcW()});
+document.addEventListener("change",e=>{if(e.target.id==="wp"&&PL[e.target.value]){ANIM=false;setPlace({name:e.target.value,lat:PL[e.target.value][0],lon:PL[e.target.value][1]});render()}});
 render();
 </script>
 </body>
