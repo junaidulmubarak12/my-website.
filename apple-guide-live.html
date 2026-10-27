@@ -68,6 +68,7 @@ button:active{transform:scale(.97)}
 label{display:block;font-weight:700;margin:14px 0 4px}
 input,select,textarea{width:100%;min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;font:inherit;background:var(--bg);color:var(--ink)}
 .verdict{padding:18px;border-radius:24px;margin-top:14px}.go{background:var(--ok)}.wait{background:var(--wait)}.stop{background:var(--stop)}
+.rw small{display:block;color:var(--mut);font-size:.8rem}.rw.skip{opacity:.45}.dz{text-align:right;flex:0 0 40%}.dz b{white-space:normal}
 .why{padding:11px 4px;border-top:1px solid var(--line)}
 .ent{padding:14px 0;border-top:1px solid var(--line)}
 .x{margin-top:8px;min-height:40px;padding:0 16px;border-radius:999px;border:2px solid #c0392b;background:none;color:#c0392b;font:inherit;font-weight:600;cursor:pointer}
@@ -100,7 +101,7 @@ const ST=[
 {n:9,t:"Fruit development II",fn:"If rain is forecast, spray one of:",f:"Difenoconazole 25EC (30ml)|Flusilazole 40EC (20ml)|Penconazole 10EC (50ml)|Trifloxystrobin + Tebuconazole 75WG (40g)|Fluopyram 17.7% + Tebuconazole 17.7% 400SC (50ml)|Fluxapyroxad 250g/l + Pyraclostrobin 250g/l 500SC (20ml)|Fluxapyroxad 75g/l + Difenoconazole 50g/l SC (30ml)|Chlorothalonil 40% + Difenoconazole 4% 44SC (180ml)|Mancozeb 63% + Carbendazim 12% WP (250g)|Trifloxystrobin 10% + Difenoconazole 12.25% + Sulphur 3% SC (90ml)",ni:"Insects:",i:"Chlorpyriphos 20EC (100ml)|Quinalphos 25EC (100ml)|Thiacloprid 21.7SC (40ml)|Summer spray oil (750ml)",nm:"Mites:",m:"Hexythiazox 5.45EC (40ml)|Fenazaquin 10EC (40ml)|Spiromesifen 22.9SC (40ml)|Propargite 42% + Hexythiazox 2% EC (100ml)|Etoxazole 10SC (110ml)|Summer spray oil (750ml)",c:"Second calcium chloride spray (3–4 g/litre). If a tree’s leaves fade or look different from similar trees, inspect roots and collar for rot, scrape dead wood and follow the package of practices. Irrigate as needed; de-weed tree basins."},
 {n:10,t:"Fruit development III",fn:"If rain is forecast, spray one of these before the rains:",f:"Mancozeb 75WP (300g)|Zineb 75WP (300g)|Ziram 80WP (200g)|Ziram 27SC (600ml)|Chlorothalonil 75WP (150g)|Mancozeb 75WG (300g)",ni:"Insects, need based:",i:"Chlorpyriphos 20EC (100ml)|Quinalphos 25EC (100ml)|Thiacloprid 21.7SC (40ml)|Neem oil 1500 ppm (300ml), then after 4 days Lecanicillium lecanii or Metarhizium anisopliae (500g)",nm:"Mites, when more than 10 per leaf:",m:"Fenazaquin 10EC (40ml)|Cyenopyrafen 30SC (30ml)|Etoxazole 10SC (110ml)",c:"Avoid spraying under wet and hot conditions; it can burn the leaves. Keep mite and aphid numbers low to avoid Alternaria leaf blotch and sooty mould. Fruit fly: methyl eugenol traps, 25–40 per hectare. Third calcium chloride spray, last 1/3 urea, potassium sulphate 4–5 g/litre for colour if needed."},
 {n:11,t:"Fruit development IV",fn:"If Alternaria leaf blotch or scab is present, spray one of:",f:"Zineb 68% + Hexaconazole 4% 72WP (125g)|Hexaconazole 5EC (50ml)|Myclobutanil 10WP (70g)|Metiram 55% + Pyraclostrobin 5% 60WG (100g)|Pyraclostrobin 12.8% + Boscalid 25.2% WG (30g)",ni:"For sooty blotch or fly speck, spray one of:",i:"Mancozeb 75WP (300g)|Ziram 27SC (600ml)|Propineb 70WP (300g)|Ziram 80WP (200g)|Mancozeb 75WG (300g)",c:"Avoid spraying immediately after heavy rains, especially in low-altitude areas. Collect fallen fruit, de-weed tree basins, stake heavy branches, harvest early varieties early."},
-{n:12,t:"Pre-harvest",x:"Check the waiting periods before you spray. The table in the Safety tab lists Propineb at 29 days and Ziram at 17 days, and the guide’s general rule says to stop sprays 3–4 weeks before harvest. Ask a SKUAST-K or Horticulture Department expert before spraying at this stage.",fn:"For long-term storage, the guide lists one of these fungicides 15–20 days before harvest:",f:"Captan 50WP (300g)|Propineb 70WP (300g)|Ziram 80WP (200g)|Zineb 75WP (300g)",c:"Need based: NAA (10 ppm) against pre-harvest fruit drop, second potassium sulphate spray (4–5 g/litre) for colour, calcium chloride (3–4 g/litre) for storage life. Cut orchard grass and remove water shoots."},
+{n:12,t:"Pre-harvest",x:"Check the waiting periods before you spray. The table in the Learn tab lists Propineb at 29 days and Ziram at 17 days, and the guide’s general rule says to stop sprays 3–4 weeks before harvest. Ask a SKUAST-K or Horticulture Department expert before spraying at this stage.",fn:"For long-term storage, the guide lists one of these fungicides 15–20 days before harvest:",f:"Captan 50WP (300g)|Propineb 70WP (300g)|Ziram 80WP (200g)|Zineb 75WP (300g)",c:"Need based: NAA (10 ppm) against pre-harvest fruit drop, second potassium sulphate spray (4–5 g/litre) for colour, calcium chloride (3–4 g/litre) for storage life. Cut orchard grass and remove water shoots."},
 {n:13,t:"Harvest",c:"No sprays. Maturity checks: starch index 2.5 for CA storage and 3.5 for table use, fruit skin more than 75% red, TSS 12–14 Brix, pressure 16–18 lb per square inch, seeds more than 75% dark brown, days after full bloom (depends on variety)."},
 {n:14,t:"Post-harvest",ni:"Insects, need based:",i:"Chlorpyriphos 20EC (100ml)|Essential where apple blotch leaf miner is a problem: Quinalphos 25EC (100ml)",nm:"Mites, when more than 20 per leaf:",m:"Fenazaquin 10EC (40ml)|Etoxazole 10SC (110ml)",c:"Collect and destroy fallen leaves, mummified fruits and dead wood. Spray 3–4% urea when half the leaves have turned yellow in scab or Alternaria infected orchards. Close anti-hail nets, tighten trellis wires, stake branches against snow, test the soil."},
 {n:15,t:"Dormancy",c:"Prune virus-infected trees last and sterilize the tools. Apply fungicidal paste on pruning wounds. If the urea spray was missed in autumn, spray 5% urea on the orchard floor. Scrape cankers and apply paste. Keep the orchard clean."}
@@ -162,12 +163,16 @@ const setPlace=p=>{PLACE=p;try{localStorage.setItem("apple-place",JSON.stringify
 function wxView(){
   return `<h1>Weather check</h1><p class="m">Live weather for your orchard. Mausam dekh kar faisla.</p>
   <div class="card" id="wcard"></div>
-  <div class="sec"><h3>Your answers</h3><p class="m">Filled in from the forecast when a place is chosen. You can change any answer.</p>
+  <div class="sec"><h3>What should I spray today?</h3><p class="m">Answer these questions. The page then shows what the guide allows for your stage and weather, with doses and waiting periods.</p>
   <label for="ws">Stage of your trees</label><select id="ws">${ST.map(s=>`<option value="${s.n}"${s.n===cur?" selected":""}>Stage ${s.n}: ${esc(s.t)}</option>`).join("")}</select>
+  <label for="wk">What do you see in the orchard?</label><select id="wk"><option value="routine">Nothing special, routine protection</option><option value="scab">Scab or Alternaria leaf blotch</option><option value="sooty">Sooty blotch or fly speck</option><option value="insects">Insects or leaf miner</option><option value="mites">Mites</option></select>
+  <div id="wmw" hidden><label for="wm">Mites per leaf (count a few leaves)</label><input id="wm" type="number" min="0" value="0"></div>
   <label for="wr">Rain forecast</label><select id="wr"><option value="now">Rain within 24 hours</option><option value="week">Rain later this week</option><option value="dry">Dry for the next 7 days</option></select>
   <label for="wh">Is it very hot now?</label><select id="wh"><option value="0">No</option><option value="1">Yes, high temperature</option></select>
   <label for="ww">Is it raining, or are the leaves wet?</label><select id="ww"><option value="0">No</option><option value="1">Yes</option></select>
-  <label for="wg">Days since your last fungicide spray</label><input id="wg" type="number" min="0" value="7"></div>
+  <label for="wg">Days since your last fungicide spray</label><input id="wg" type="number" min="0" value="7">
+  <label for="wl">Product you sprayed last (optional)</label><input id="wl" value="${esc(D.length?D[0].p:"")}" placeholder="For example, Mancozeb 75WP">
+  <label for="wt">Your spray tank size in litres</label><input id="wt" type="number" min="1" value="${TANK}"></div>
   <div id="wo"></div>`;
 }
 
@@ -183,12 +188,46 @@ function advise(s,rain,hot,wet,gap){
   if(hot)add("wait","High temperature: do not spray in the heat. Spray in the early morning or evening.");
   if(wet)add("wait","Rainy or wet weather: avoid spraying. It can burn the leaves, especially in Stage 10.");
   add("wait","If heavy rain falls within 12 hours after spraying, repeat the spray (when no sticker or adjuvant was used). Never spray in full bloom.");
-  return [o.some(x=>x[0]==="stop")?"stop":o.some(x=>x[0]==="go")?"go":"wait",o];
+  return [o.some(x=>x[0]==="stop")?"stop":(hot||wet)?"wait":o.some(x=>x[0]==="go")?"go":"wait",o];
+}
+const canSpray=(s,rain,gap)=>s===5?rain&&gap>=10:(s===2||s===3||(s>=6&&s<=10))?rain:(s===4||s===12);
+let TANK=100;try{TANK=+localStorage.getItem("apple-tank")||100}catch(e){}
+const ACT=Object.keys(PHI).concat(["zineb","neem","quinalphos","chlorpyriphos","thiacloprid","fenazaquin","etoxazole","cyenopyrafen","carbendazim","sulphur"]);
+function recRow(x,last,tank,s){
+  x=x.trim();const m=x.match(/^(.*?)\s*\(([^()]*)\)$/),ok=m&&m[1].length<90&&!/then/.test(x);
+  const name=ok?m[1]:x,dose=ok?m[2]:"",q=x.toLowerCase();
+  const same=ACT.some(k=>q.includes(k)&&last.includes(k)),w=phi(x),dm=dose.match(/^([\d.]+)\s*(g|ml|l)$/i);
+  const big=dm&&tank!==100?`${+(dm[1]*tank/100).toFixed(1)} ${dm[2].toLowerCase()==="l"?"L":dm[2].toLowerCase()}`:dose;
+  const unk=["zineb","carbendazim","sulphur"].filter(k=>q.includes(k)),dy=w+(w===1?" day":" days");
+  const note=same?"Skip: same as your last spray":w===null?"Waiting period: check the label":s===12&&w>20?"Waiting period "+dy+" is longer than this stage’s 15–20 days. Ask an expert first.":unk.length?"At least "+dy+". The guide’s table does not list "+unk.join(" or ")+", so check the label.":"Waiting period "+dy;
+  return `<div class="rw${same?" skip":""}"><span>${esc(name)}<small${s===12&&w>20&&!same?' style="color:var(--green)"':""}>${note}</small></span><div class="dz"><b>${esc(big)}</b>${dose&&tank!==100?`<small>for ${tank} L (guide: ${esc(dose)} per 100 L)</small>`:""}</div></div>`;
+}
+function recHTML(s,v,can,prob,mites,last,tank){
+  const S=ST[s-1],MT={6:4,7:5,8:10,10:10,14:20};
+  const blk=(t,n,l)=>`<div class="sec"><h3>${t}</h3>${n?`<p>${esc(n)}</p>`:""}${l.split("|").map(x=>recRow(x,last,tank,s)).join("")}</div>`;
+  const msg=(t,m)=>`<div class="sec"><h3>${t}</h3><p>${m}</p></div>`;
+  if(v==="stop")return msg("What to spray","Nothing right now. Check again when the forecast changes.");
+  let h="";
+  if(s===1)h+=blk("Oil spray",S.ni,S.i);
+  else if(s===11)h+=prob==="scab"?blk("Fungicide for scab or Alternaria leaf blotch",S.fn,S.f):prob==="sooty"?blk("Fungicide for sooty blotch or fly speck",S.ni,S.i):msg("Fungicide","Stage 11 sprays are only for scab, Alternaria leaf blotch, sooty blotch or fly speck. Choose what you see in the orchard above.");
+  else if(S.f)h+=can?blk("Fungicide",S.fn,S.f):(prob==="scab"&&s!==5)?blk("Fungicide for the scab you see",(S.fn||"")+" Spray when the weather allows, not in heat or rain.",S.f):msg("Fungicide","No fungicide is scheduled by the guide today. It lists these only before rain.");
+  if(prob==="insects"&&s!==1&&S.i&&s!==11)h+=blk("Insecticide (need based)",S.ni,S.i);
+  if(prob==="mites"&&s!==11){
+    const t=MT[s];
+    if(!S.m)h+=msg("Mites","The guide lists no mite spray for this stage.");
+    else if(t!==undefined&&mites<=t)h+=msg("Mites",`The guide says to spray only above ${t} mites per leaf. ${mites?"You counted "+mites+", so do not spray for mites yet.":"Count a few leaves and enter the number above."}`);
+    else h+=blk("Mite spray",S.nm,S.m);
+  }
+  if(s===12&&S.x)h+=`<div class="call"><b>Check before spraying.</b> ${esc(S.x)}</div>`;
+  return h+`<p class="m">Use one product from each list, never the same pesticide in two sprays in a row, and keep 3–4 days between an insecticide and a fungicide spray. Check the product label and the waiting period before you buy.</p>`;
 }
 function calcW(){
-  const [w,o]=advise(+$("ws").value,$("wr").value!=="dry",$("wh").value==="1",$("ww").value==="1",+$("wg").value||0);
+  const s=+$("ws").value,rain=$("wr").value!=="dry",hot=$("wh").value==="1",wet=$("ww").value==="1",gap=+$("wg").value||0;
+  const prob=$("wk").value,mites=+$("wm").value||0,last=$("wl").value.toLowerCase(),tank=Math.max(1,+$("wt").value||100);
+  $("wmw").hidden=prob!=="mites";
+  const [w,o]=advise(s,rain,hot,wet,gap);
   const T={go:"Spray before the rain",wait:"Wait and check",stop:"Do not spray"},H={go:"Rain se pehle spray karein",wait:"Ruk kar dekhein",stop:"Spray na karein"};
-  $("wo").innerHTML=`<div class="verdict ${w}"><h2>${T[w]}</h2><p class="m">${H[w]}</p></div><div class="sec">${o.map(x=>`<div class="why">${esc(x[1])}</div>`).join("")}</div>`;
+  $("wo").innerHTML=`<div class="verdict ${w}"><h2>${T[w]}</h2><p class="m">${H[w]}. Stage ${s}: ${esc(ST[s-1].t)}</p></div>`+recHTML(s,w,canSpray(s,rain,gap),prob,mites,last,tank)+`<div class="sec"><h3>Why</h3>${o.map(x=>`<div class="why">${esc(x[1])}</div>`).join("")}</div>`;
 }
 
 function wxIn(w){
@@ -349,7 +388,7 @@ document.addEventListener("click",e=>{
   }
   render();
 });
-document.addEventListener("input",e=>{if(e.target.id==="ws")setCur(+e.target.value);if(tab==="wx"&&$("wo"))calcW()});
+document.addEventListener("input",e=>{if(e.target.id==="ws")setCur(+e.target.value);if(e.target.id==="wt"){TANK=Math.max(1,+e.target.value||100);try{localStorage.setItem("apple-tank",TANK)}catch(x){}}if(tab==="wx"&&$("wo"))calcW()});
 document.addEventListener("change",e=>{if(e.target.id==="wp"&&PL[e.target.value]){ANIM=false;setPlace({name:e.target.value,lat:PL[e.target.value][0],lon:PL[e.target.value][1]});render()}});
 render();
 </script>
