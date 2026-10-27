@@ -4,18 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#17805a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Apple Guide">
 <title>Kashmir Apple Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f1f1ec;--card:#fafaf7;--ink:#1d2a24;--mut:#6b7872;--line:#e4e6df;--green:#17805a;--on:#fff;--orange:#f4a261;--tb:#d9eef1;--tp:#f6dcd8;--ok:#dff1e7;--wait:#fbefd2;--stop:#f9dedb;--sh:0 10px 28px rgba(40,55,45,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);font-size:calc(16px*var(--fs,1))}
 @media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101613;--card:#18211c;--ink:#e8efe9;--mut:#93a39a;--line:#26332c;--green:#3fc592;--on:#06261a;--tb:#1b3a40;--tp:#40262a;--ok:#1b3322;--wait:#3a3216;--stop:#3d1d1e;--sh:none}}
 :root[data-theme="dark"]{--bg:#101613;--card:#18211c;--ink:#e8efe9;--mut:#93a39a;--line:#26332c;--green:#3fc592;--on:#06261a;--tb:#1b3a40;--tp:#40262a;--ok:#1b3322;--wait:#3a3216;--stop:#3d1d1e;--sh:none}
 *,*:before,*:after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Plus Jakarta Sans",system-ui,"Segoe UI",Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.5 "Plus Jakarta Sans",system-ui,"Segoe UI",Arial,sans-serif}
 main{max-width:720px;margin:0 auto;padding:18px 16px 120px}
 h1{font-size:1.7rem;font-weight:800;margin:0;line-height:1.15}h2{font-size:1.35rem;font-weight:800;margin:2px 0;line-height:1.2}h3{font-size:1.05rem;font-weight:800;margin:0 0 8px}
 .m{color:var(--mut);margin:4px 0;font-size:.92rem}
@@ -69,6 +75,9 @@ label{display:block;font-weight:700;margin:14px 0 4px}
 input,select,textarea{width:100%;min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;font:inherit;background:var(--bg);color:var(--ink)}
 .verdict{padding:18px;border-radius:24px;margin-top:14px}.go{background:var(--ok)}.wait{background:var(--wait)}.stop{background:var(--stop)}
 .rw small{display:block;color:var(--mut);font-size:.8rem}.rw.skip{opacity:.45}.dz{text-align:right;flex:0 0 40%}.dz b{white-space:normal}
+.set{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-top:1px solid var(--line)}.set b{display:block}
+.seg{display:flex;background:var(--line);border-radius:999px;padding:3px}.seg button{flex:1;border:0;background:none;color:var(--ink);font:inherit;font-weight:600;border-radius:999px;min-height:40px;cursor:pointer}.seg button.on{background:var(--green);color:var(--on)}
+.nohint .hi{display:none}.calm *,.calm *:before,.calm *:after{animation:none!important;transition:none!important}
 .why{padding:11px 4px;border-top:1px solid var(--line)}
 .ent{padding:14px 0;border-top:1px solid var(--line)}
 .x{margin-top:8px;min-height:40px;padding:0 16px;border-radius:999px;border:2px solid #c0392b;background:none;color:#c0392b;font:inherit;font-weight:600;cursor:pointer}
@@ -122,7 +131,13 @@ const list=s=>s?s.split("|").map(rowH).join(""):"";
 const sec=(h,n,l)=>(n||l)?`<div class="sec"><h3>${h}</h3>${n?`<p>${esc(n)}</p>`:""}${list(l)}</div>`:"";
 
 
-const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const DEF={size:1,theme:"auto",hint:true,calm:false,heat:30,tank:100};
+let SET={...DEF};try{SET={...DEF,...JSON.parse(localStorage.getItem("apple-settings"))}}catch(e){}
+const saveSet=()=>{try{localStorage.setItem("apple-settings",JSON.stringify(SET))}catch(e){}};
+function applySet(){const r=document.documentElement;r.style.setProperty("--fs",SET.size);SET.theme==="auto"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",SET.theme);document.body.classList.toggle("nohint",!SET.hint);r.classList.toggle("calm",!!SET.calm)}
+applySet();
+const OSRM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const rm=()=>OSRM||SET.calm;
 let ANIM=true,LOAD=false,ERR=false;
 const LOGO=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8c-1.5-1.6-6-1.4-6 4.2 0 3.7 2.6 7.8 4.6 7.8.9 0 1.1-.5 1.4-.5s.5.5 1.4.5c2 0 4.6-4.1 4.6-7.8C18 6.6 13.5 6.4 12 8z" fill="#b3262e"/><path d="M12 8c0-2 1-3.5 3-4" stroke="#3f8f4a" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>`;
 const mi=p=>`<svg class="mi" viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
@@ -133,7 +148,7 @@ const wicon=c=>c===0?`<svg viewBox="0 0 48 48" class="wi"><circle cx="24" cy="24
 
 function homeView(){
   const s=ST[cur-1];
-  return `<div class="gr"><div><span class="m">${greet()}</span><h1>Assalamu alaikum</h1></div><button class="round" data-g="learn" aria-label="Safety notes and about">${LOGO}</button></div>
+  return `<div class="gr"><div><span class="m">${greet()}${PROF.name?", "+esc(PROF.name):""}</span><h1>Assalamu alaikum</h1></div><button class="round" data-g="learn" aria-label="Safety notes and about">${LOGO}</button></div>
   <div class="chips" id="strip">${ST.map(x=>`<button class="chip${x.n===cur?" on":""}" data-s="${x.n}"><img src="${IMG[x.n]}" alt="">${esc(x.t)}</button>`).join("")}</div>
   <div class="card stage"><img src="${IMG[s.n]}" alt="${esc(s.t)}"><div class="tx"><span class="m">Stage ${s.n} of 15</span><h2>${esc(s.t)}</h2><p class="lead">${esc(KEY[cur-1])}</p><button class="btn" data-g="spr">See sprays and doses</button></div></div>
   <div class="card" id="wcard"></div><div class="tiles" id="htiles"></div>
@@ -161,7 +176,7 @@ try{PLACE=JSON.parse(localStorage.getItem("apple-place"))}catch(e){}
 const setPlace=p=>{PLACE=p;try{localStorage.setItem("apple-place",JSON.stringify(p))}catch(e){}};
 
 function wxView(){
-  return `<h1>Weather check</h1><p class="m">Live weather for your orchard. Mausam dekh kar faisla.</p>
+  return `<h1>Weather check</h1><p class="m">Live weather for your orchard. <span class="hi">Mausam dekh kar faisla.</span></p>
   <div class="card" id="wcard"></div>
   <div class="sec"><h3>What should I spray today?</h3><p class="m">Answer these questions. The page then shows what the guide allows for your stage and weather, with doses and waiting periods.</p>
   <label for="ws">Stage of your trees</label><select id="ws">${ST.map(s=>`<option value="${s.n}"${s.n===cur?" selected":""}>Stage ${s.n}: ${esc(s.t)}</option>`).join("")}</select>
@@ -191,7 +206,7 @@ function advise(s,rain,hot,wet,gap){
   return [o.some(x=>x[0]==="stop")?"stop":(hot||wet)?"wait":o.some(x=>x[0]==="go")?"go":"wait",o];
 }
 const canSpray=(s,rain,gap)=>s===5?rain&&gap>=10:(s===2||s===3||(s>=6&&s<=10))?rain:(s===4||s===12);
-let TANK=100;try{TANK=+localStorage.getItem("apple-tank")||100}catch(e){}
+let TANK=SET.tank;
 const ACT=Object.keys(PHI).concat(["zineb","neem","quinalphos","chlorpyriphos","thiacloprid","fenazaquin","etoxazole","cyenopyrafen","carbendazim","sulphur"]);
 function recRow(x,last,tank,s){
   x=x.trim();const m=x.match(/^(.*?)\s*\(([^()]*)\)$/),ok=m&&m[1].length<90&&!/then/.test(x);
@@ -227,14 +242,14 @@ function calcW(){
   $("wmw").hidden=prob!=="mites";
   const [w,o]=advise(s,rain,hot,wet,gap);
   const T={go:"Spray before the rain",wait:"Wait and check",stop:"Do not spray"},H={go:"Rain se pehle spray karein",wait:"Ruk kar dekhein",stop:"Spray na karein"};
-  $("wo").innerHTML=`<div class="verdict ${w}"><h2>${T[w]}</h2><p class="m">${H[w]}. Stage ${s}: ${esc(ST[s-1].t)}</p></div>`+recHTML(s,w,canSpray(s,rain,gap),prob,mites,last,tank)+`<div class="sec"><h3>Why</h3>${o.map(x=>`<div class="why">${esc(x[1])}</div>`).join("")}</div>`;
+  $("wo").innerHTML=`<div class="verdict ${w}"><h2>${T[w]}</h2><p class="m"><span class="hi">${H[w]}. </span>Stage ${s}: ${esc(ST[s-1].t)}</p></div>`+recHTML(s,w,canSpray(s,rain,gap),prob,mites,last,tank)+`<div class="sec"><h3>Why</h3>${o.map(x=>`<div class="why">${esc(x[1])}</div>`).join("")}</div>`;
 }
 
 function wxIn(w){
   const c=w.current,h=w.hourly,d=w.daily,code=c.weather_code;
   let i=h.time.findIndex(t=>t>=c.time.slice(0,13)+":00");if(i<0)i=0;
   const n24=h.precipitation.slice(i,i+24).reduce((a,b)=>a+(b||0),0);
-  return{n24,rain:n24>=1?"now":d.precipitation_sum.some(x=>x>=1)?"week":"dry",hot:c.temperature_2m>=30,
+  return{n24,rain:n24>=1?"now":d.precipitation_sum.some(x=>x>=1)?"week":"dry",hot:c.temperature_2m>=SET.heat,
     wet:(c.precipitation||0)>0||(code>=51&&code<=67)||(code>=80&&code<=82)||code>=95,
     cond:code===0?"Clear":code<=3?"Partly cloudy":code<=48?"Fog":code<=57?"Drizzle":code<=67?"Rain":code<=77?"Snow":code<=82?"Rain showers":code<=86?"Snow showers":"Thunderstorm"};
 }
@@ -247,15 +262,15 @@ function wcardHTML(w){
   const c=w.current,d=w.daily,x=wxIn(w),t=Math.round(c.temperature_2m);
   const sr=new Date(d.sunrise[0]),ss=new Date(d.sunset[0]),f=Math.max(0,Math.min(1,(new Date(c.time)-sr)/(ss-sr))),g=1-f;
   const px=g*g*12+2*g*f*100+f*f*188,py=g*g*72+2*g*f*-30+f*f*72,P="M12 72Q100-30 188 72";
-  const sun=RM?`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="#f4a261"/>`:`<circle r="7" fill="#f4a261"><animateMotion path="${P}" keyPoints="0;${f.toFixed(3)}" keyTimes="0;1" calcMode="linear" dur="1.8s" fill="freeze"/></circle>`;
-  return head+`<div class="wt"><div><div class="big"><span data-count="${t}">${t}</span>°C</div><div class="m">${x.cond}</div></div>${wicon(c.weather_code)}</div>
+  const sun=rm()?`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="7" fill="#f4a261"/>`:`<circle r="7" fill="#f4a261"><animateMotion path="${P}" keyPoints="0;${f.toFixed(3)}" keyTimes="0;1" calcMode="linear" dur="1.8s" fill="freeze"/></circle>`;
+  return head+(WX&&WX.old?`<div class="call" style="margin-top:12px"><b>Old forecast.</b> There is no internet, so this is the forecast saved at ${tm(WX.t)}. Check the weather again when you are online before you spray.</div>`:"")+`<div class="wt"><div><div class="big"><span data-count="${t}">${t}</span>°C</div><div class="m">${x.cond}</div></div>${wicon(c.weather_code)}</div>
   <div class="mets">${[[ICO.hum,c.relative_humidity_2m+"%","Humidity"],[ICO.wind,Math.round(c.wind_speed_10m)+" km/h","Wind"],[ICO.rain,(c.precipitation||0)+" mm","Rain now"],[ICO.next,x.n24.toFixed(1)+" mm","Next 24 h"]].map(m=>`<div>${m[0]}<b>${m[1]}</b><span>${m[2]}</span></div>`).join("")}</div>
   <div class="sun"><svg viewBox="0 0 200 84" aria-hidden="true"><path class="arc" d="${P}"/>${sun}</svg><div><span>Sunrise ${tm(d.sunrise[0])}</span><span>Sunset ${tm(d.sunset[0])}</span></div></div>
-  ${tab==="wx"?d.time.map((q,k)=>`<div class="rw"><span>${new Date(q+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}</span><b>${(d.precipitation_sum[k]||0).toFixed(1)} mm rain, high ${Math.round(d.temperature_2m_max[k])}°C</b></div>`).join("")+`<p class="m">Rain of 1 mm or more counts as rain. The guide gives no number for heat, so this page treats 30°C or more as hot.</p>`:""}`;
+  ${tab==="wx"?d.time.map((q,k)=>`<div class="rw"><span>${new Date(q+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}</span><b>${(d.precipitation_sum[k]||0).toFixed(1)} mm rain, high ${Math.round(d.temperature_2m_max[k])}°C</b></div>`).join("")+`<p class="m">Rain of 1 mm or more counts as rain. The guide gives no number for heat, so this page treats ${SET.heat}°C or more as hot (change this in Learn, under Settings).</p>`:""}`;
 }
 function tilesHTML(w){
   const x=w&&wxIn(w);let v="–",lab="Choose a place";
-  if(x){v={go:"Go",wait:"Wait",stop:"Stop"}[advise(cur,x.rain!=="dry",x.hot,x.wet,7)[0]];lab="Spray advice"}
+  if(x){v={go:"Go",wait:"Wait",stop:"Stop"}[advise(cur,x.rain!=="dry",x.hot,x.wet,7)[0]];lab=WX&&WX.old?"Old forecast":"Spray advice"}
   return `<div class="tile g"><b>${v}</b><span>${lab}</span></div>
   <div class="tile b"><b>${x?`<span data-count="${x.n24.toFixed(1)}" data-dec="1">${x.n24.toFixed(1)}</span>`:"–"}</b><span>mm in 24 h</span></div>
   <div class="tile p"><b><span data-count="${cur}">${cur}</span>/15</b><span>Spray stage</span></div>`;
@@ -285,7 +300,11 @@ async function loadWx(){
     const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=precipitation&daily=precipitation_sum,temperature_2m_max,sunrise,sunset&forecast_days=7&timezone=auto`);
     if(!r.ok)throw new Error("bad response");
     WX={j:await r.json(),k:p.lat+","+p.lon,t:Date.now()};
-  }catch(e){ERR=true}
+    try{localStorage.setItem("apple-wx",JSON.stringify(WX))}catch(x){}
+  }catch(e){
+    let s=null;try{s=JSON.parse(localStorage.getItem("apple-wx"))}catch(x){}
+    if(s&&s.k===p.lat+","+p.lon&&Date.now()-s.t<432e5)WX={...s,old:true};else ERR=true;
+  }
   LOAD=false;fillWx();
 }
 function gps(){
@@ -296,7 +315,7 @@ function gps(){
 function counts(){
   document.querySelectorAll("[data-count]").forEach(el=>{
     const t=+el.dataset.count,d=+el.dataset.dec||0;
-    if(RM)return;
+    if(rm())return;
     const t0=performance.now(),step=n=>{const k=Math.min(1,(n-t0)/900);el.textContent=(t*(1-Math.pow(1-k,3))).toFixed(d);if(k<1)requestAnimationFrame(step)};
     requestAnimationFrame(step);
   });
@@ -313,7 +332,7 @@ function diaView(){
     let w=`<span class="m">Waiting period is not in the guide’s table. Check the product label.</span>`;
     if(e.d!==null){const h=new Date(e.date+"T00:00:00");h.setDate(h.getDate()+e.d);w=`<b>Do not harvest, cut grass or let animals in before ${fmt(h)}</b> (${e.d} days)`}
     return `<div class="ent"><b>${esc(e.p)}</b>${e.dose?" ("+esc(e.dose)+")":""}<br><span class="m">${fmt(new Date(e.date+"T00:00:00"))}, Stage ${esc(e.st)}${e.block?", "+esc(e.block):""}</span>${e.note?"<br>"+esc(e.note):""}<br>${w}<br><button class="x" data-a="del" data-i="${i}">Delete</button></div>`}).join("");
-  return `<h1>Spray diary</h1><p class="m">Apna spray ka record. Saved on this phone only. The page works out the earliest safe harvest date from the guide’s waiting periods.</p>
+  return `<h1>Spray diary</h1><p class="m"><span class="hi">Apna spray ka record. </span>Saved on this phone only. The page works out the earliest safe harvest date from the guide’s waiting periods.</p>
   <label for="dd">Date</label><input id="dd" type="date" value="${iso}">
   <label for="ds">Stage</label><select id="ds">${ST.map(s=>`<option value="${s.n}"${s.n===cur?" selected":""}>${s.n}: ${esc(s.t)}</option>`).join("")}</select>
   <label for="dp">Product sprayed</label><input id="dp" placeholder="For example, Mancozeb 75WP">
@@ -324,8 +343,24 @@ function diaView(){
   <div class="sec"><h3>Saved sprays</h3>${rows||`<p class="m">Nothing saved yet. Your sprays will appear here.</p>`}</div>`;
 }
 
+const seg=(k,o)=>`<div class="seg">${o.map(x=>`<button class="${SET[k]===x[0]?"on":""}" data-set="${k}" data-v="${x[0]}">${x[1]}</button>`).join("")}</div>`;
+function settingsHTML(){
+  const row=(t,d,c)=>`<div class="set"><div><b>${t}</b><span class="m">${d}</span></div>${c}</div>`;
+  return `<div class="sec" id="settings"><h3>Settings</h3><p class="m">The recommended choices are already selected. Your choices are saved on this phone.</p>
+  ${accHTML()}
+  ${row("Text size","Larger text is easier to read in sunlight. Large is recommended.",seg("size",[[1,"Normal"],[1.15,"Large"],[1.3,"Extra large"]]))}
+  ${row("Screen colours","Auto follows your phone. Dark is easier on the eyes at night.",seg("theme",[["auto","Auto"],["light","Light"],["dark","Dark"]]))}
+  ${row("Hinglish hints","Short Hinglish lines under the English. Recommended: On.",seg("hint",[[true,"On"],[false,"Off"]]).replace(/data-v="true"/,'data-v="1"').replace(/data-v="false"/,'data-v="0"'))}
+  ${row("Animations","Turn off to save battery on an older phone. Recommended: On.",seg("calm",[[false,"On"],[true,"Off"]]).replace(/data-v="true"/,'data-v="1"').replace(/data-v="false"/,'data-v="0"'))}
+  ${row("Install on this phone",standalone()?"Already installed. After the first visit with internet, the guide also opens without signal.":"After you open the guide once with internet, it works without signal. Live weather still needs internet. Android: Chrome menu, then Install app. iPhone: Share, then Add to Home Screen.",INST?`<div class="wh"><button class="pill" data-a="install">Install</button></div>`:"")}
+  ${row("My place for the weather",PLACE?esc(PLACE.name):"Not chosen yet",`<div class="wh"><button class="pill alt" data-g="wx">Change</button>${PLACE?`<button class="pill alt" data-a="forgetplace">Forget</button>`:""}</div>`)}
+  ${row("Spray tank size (litres)","The guide gives doses per 100 litres. Enter your tank size and the Weather page works out the dose for it.",`<input id="st-tank" type="number" min="1" value="${SET.tank}">`)}
+  ${row("Hot weather limit (°C)","The guide says not to spray in high heat but gives no number. The recommended starting value is 30°C. Ask your expert and change it here.",`<input id="st-heat" type="number" min="1" value="${SET.heat}">`)}
+  ${row("My data","Spray diary entries and settings are stored only on this phone.",`<div class="wh"><button class="pill alt" data-a="cleardiary">Clear spray diary</button><button class="pill alt" data-a="resetset">Reset settings</button></div>`)}
+  <div class="set"><div><b>About this guide</b><span class="m">Kashmir Apple Guide, version 1. Spray information copied in October 2026 from the SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026. It has not yet been reviewed by an expert.</span></div></div></div>`;
+}
 function learnView(){
-  return `<h1>Learn</h1>
+  return `<h1>Learn</h1><div class="wh" style="margin-top:10px"><button class="pill alt" data-jump="settings">Go to Settings</button></div>
   <div class="sec"><h3>Scab</h3><p class="m">What the guide says. Photos and symptom descriptions will be added after expert review.</p><ul>
   <li>Pink bud is the crucial stage for primary scab infection. Keep the orchard clean and drained.</li>
   <li>At petal fall, remove all scab-infected leaves before the rains start.</li>
@@ -354,16 +389,113 @@ function learnView(){
   <li>Do not move pesticide to another container. Do not use leaking equipment. Ask an expert if unsure.</li></ul></details>
   <details><summary>Waiting period before harvest</summary><p class="m">Do not harvest fruit, cut grass or let poultry or livestock into the orchard until the waiting period after the last spray is complete.</p>
   <table>${Object.keys(PHI).map(k=>`<tr><td>${k[0].toUpperCase()+k.slice(1)}</td><td>${PHI[k]} days</td></tr>`).join("")}</table>
-  <p class="m">Zineb is not in the guide’s table. Check its label.</p></details>`;
+  <p class="m">Zineb is not in the guide’s table. Check its label.</p></details>${settingsHTML()}`;
 }
 
 const FOOT=`<p class="foot">Photos and spray guidance: SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026. This page repeats the guide and may contain copying errors. Check the original and ask a Plant Protection officer before you spray. Use and sale of products depend on CIB &amp; RC registration and label claim.</p>`;
 
 
+
+/* ---------- Works without internet, and can be installed ---------- */
+let INST=null,hideInst=false;try{hideInst=localStorage.getItem("apple-inst")==="1"}catch(e){}
+const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+const iOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();INST=e;ANIM=false;render()});
+addEventListener("appinstalled",()=>{INST=null;ANIM=false;render()});
+addEventListener("online",()=>{ANIM=false;render()});addEventListener("offline",()=>{ANIM=false;render()});
+if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register("sw.js").catch(()=>{});
+function topBanners(){
+  let b="";
+  if(!navigator.onLine)b+=`<div class="call" style="margin:0 0 12px"><b>You are offline.</b> The live weather needs internet. Everything else works.</div>`;
+  if(tab==="stage"&&!standalone()&&!hideInst&&(INST||iOS))b+=`<div class="card"><b>Use the guide without internet</b><p class="m">${INST?"Install it on your phone. It opens like an app and works without signal.":"Tap the Share button, then Add to Home Screen. It then opens like an app and works without signal."}</p><div class="wh">${INST?`<button class="pill" data-a="install">Install</button>`:""}<button class="pill alt" data-a="hideinst">Not now</button></div></div>`;
+  return b;
+}
+/* ---------- Optional account (Firebase email login). Paste your two Firebase values below. ---------- */
+const CFG={apiKey:"",dbUrl:""};
+const ON=!!(CFG.apiKey&&CFG.dbUrl);
+let AUTH=null,PROF={name:""},TOMB=[],SYNC="";
+const store=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+try{AUTH=JSON.parse(localStorage.getItem("apple-auth"))}catch(e){}
+try{PROF=JSON.parse(localStorage.getItem("apple-profile"))||PROF}catch(e){}
+try{TOMB=JSON.parse(localStorage.getItem("apple-tomb"))||[]}catch(e){}
+D.forEach((e,i)=>{if(!e.id)e.id="d"+Date.now().toString(36)+i});saveD();
+async function fb(path,body){
+  const r=await fetch("https://identitytoolkit.googleapis.com/v1/accounts:"+path+"?key="+CFG.apiKey,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json();if(!r.ok)throw new Error(j.error&&j.error.message||"ERROR");return j;
+}
+const ERRS={EMAIL_EXISTS:"This email already has an account. Log in instead.",INVALID_LOGIN_CREDENTIALS:"Wrong email or password.",INVALID_PASSWORD:"Wrong email or password.",EMAIL_NOT_FOUND:"No account with this email.",INVALID_EMAIL:"This email address is not valid.",MISSING_PASSWORD:"Please enter a password.",TOO_MANY_ATTEMPTS_TRY_LATER:"Too many tries. Wait a few minutes and try again.",OPERATION_NOT_ALLOWED:"Email login is not switched on in Firebase yet."};
+const friendly=e=>{const m=String(e&&e.message||"");return m.startsWith("WEAK_PASSWORD")?"Choose a password with at least 6 characters.":m==="Failed to fetch"?"No internet connection.":ERRS[m]||"Something went wrong. Please try again."};
+function setAuth(j){AUTH={email:j.email,uid:j.localId,idToken:j.idToken,refresh:j.refreshToken,exp:Date.now()+(+j.expiresIn-60)*1000};store("apple-auth",AUTH)}
+async function token(){
+  if(!AUTH)throw new Error("NOAUTH");
+  if(Date.now()<AUTH.exp)return AUTH.idToken;
+  const r=await fetch("https://securetoken.googleapis.com/v1/token?key="+CFG.apiKey,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"grant_type=refresh_token&refresh_token="+encodeURIComponent(AUTH.refresh)});
+  const j=await r.json();if(!r.ok)throw new Error("SESSION");
+  setAuth({email:AUTH.email,localId:j.user_id,idToken:j.id_token,refreshToken:j.refresh_token,expiresIn:j.expires_in});return AUTH.idToken;
+}
+const nodeUrl=async()=>CFG.dbUrl.replace(/\/+$/,"")+"/users/"+AUTH.uid+".json?auth="+await token();
+const paintAcc=()=>{const el=$("acs");if(el&&AUTH)el.textContent="Signed in as "+AUTH.email+". "+SYNC};
+/* Diary entries have ids. Deleted ids are remembered, so two phones never bring back a deleted entry. */
+async function sync(){
+  if(!ON||!AUTH)return;
+  try{
+    SYNC="Saving…";paintAcc();
+    const r=await fetch(await nodeUrl());if(!r.ok)throw new Error("DB");
+    const rem=await r.json()||{},arr=x=>Array.isArray(x)?x.filter(Boolean):x?Object.values(x):[];
+    TOMB=[...new Set([...TOMB,...arr(rem.tomb)])];
+    const seen=new Set(),all=[];
+    [...arr(rem.diary),...D].forEach(e=>{if(e&&e.id&&!TOMB.includes(e.id)&&!seen.has(e.id)){seen.add(e.id);all.push(e)}});
+    all.sort((a,b)=>(b.date||"").localeCompare(a.date||"")||b.id.localeCompare(a.id));
+    D=all;store("apple-tomb",TOMB);saveD();
+    if(rem.profile&&rem.profile.name&&!PROF.name){PROF=rem.profile;store("apple-profile",PROF)}
+    const w=await fetch(await nodeUrl(),{method:"PUT",body:JSON.stringify({diary:D,tomb:TOMB,profile:PROF})});
+    if(!w.ok)throw new Error("DB");
+    SYNC="Saved online at "+new Date().toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})+".";
+  }catch(e){
+    if(e.message==="SESSION"){AUTH=null;store("apple-auth",null);SYNC="";render();return}
+    SYNC="Could not save online. Your diary is safe on this phone and will sync later.";
+  }
+  paintAcc();
+  const f=document.activeElement;if(tab==="dia"&&!(f&&/INPUT|SELECT|TEXTAREA/.test(f.tagName)))render();
+}
+async function acct(kind){
+  const m=t=>{const el=$("acm");if(el)el.textContent=t};
+  const mail=$("ac-mail")?$("ac-mail").value.trim():"",pass=$("ac-pass")?$("ac-pass").value:"";
+  try{
+    if(kind==="login"||kind==="signup"){
+      if(!mail||!pass){m("Please enter your email and password.");return}
+      m("Please wait…");
+      setAuth(await fb(kind==="login"?"signInWithPassword":"signUp",{email:mail,password:pass,returnSecureToken:true}));
+      await sync();render();
+    }else if(kind==="forgot"){
+      if(!mail){m("Enter your email above first.");return}
+      await fb("sendOobCode",{requestType:"PASSWORD_RESET",email:mail});m("We sent a password reset link to your email.");
+    }else if(kind==="saveprof"){
+      PROF={name:$("ac-name").value.trim()};store("apple-profile",PROF);await sync();m("Saved.");
+    }else if(kind==="delacc"){
+      if(!confirm("Delete your account and your online diary? This cannot be undone."))return;
+      await fetch(await nodeUrl(),{method:"DELETE"});await fb("delete",{idToken:await token()});
+      AUTH=null;store("apple-auth",null);SYNC="";render();
+    }
+  }catch(e){m(friendly(e))}
+}
+function accHTML(){
+  if(!ON)return `<div class="set"><div><b>Account</b><span class="m">Accounts are coming soon. Your diary is saved on this phone for now.</span></div></div>`;
+  if(AUTH)return `<div class="set"><div><b>Account</b><span class="m" id="acs">Signed in as ${esc(AUTH.email)}. ${esc(SYNC)}</span></div>
+  <label for="ac-name">Your name</label><input id="ac-name" value="${esc(PROF.name)}" autocomplete="name">
+  <div class="wh"><button class="pill" data-a="saveprof">Save name</button><button class="pill alt" data-a="syncnow">Save diary online now</button><button class="pill alt" data-a="logout">Log out</button></div>
+  <p class="m">Your spray diary is saved online, so you keep it if you change phones. Logging out keeps a copy on this phone. Use Clear spray diary below to remove it.</p>
+  <div class="wh"><button class="pill alt" data-a="delacc">Delete my account and online data</button></div><div id="acm" class="m" role="status"></div></div>`;
+  return `<div class="set"><div><b>Account</b><span class="m">Optional. An account keeps your spray diary safe online so you can use it on another phone. We store only your email, your name and your spray diary.</span></div>
+  <label for="ac-mail">Email</label><input id="ac-mail" type="email" autocomplete="email">
+  <label for="ac-pass">Password (at least 6 characters)</label><input id="ac-pass" type="password" autocomplete="current-password">
+  <div class="wh"><button class="pill" data-a="login">Log in</button><button class="pill alt" data-a="signup">Create account</button><button class="pill alt" data-a="forgot">Forgot password</button></div><div id="acm" class="m" role="status"></div></div>`;
+}
+
 function render(){
   $("tabs").innerHTML=TABS.map(t=>`<button class="${t[0]===tab?"on":""}" data-tab="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[t[0]]}</svg>${t[1]}</button>`).join("");
   const v=$("v");v.className=ANIM?"anim":"";
-  v.innerHTML=({stage:homeView,spr:sprView,wx:wxView,dia:diaView,learn:learnView}[tab])()+FOOT;
+  v.innerHTML=topBanners()+({stage:homeView,spr:sprView,wx:wxView,dia:diaView,learn:learnView}[tab])()+FOOT;
   [...v.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,8)));
   if(tab==="stage"||tab==="wx"){fillWx();ensureWx()}
   const on=document.querySelector(".chip.on"),sp=$("strip");
@@ -371,26 +503,37 @@ function render(){
 }
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-s],[data-g],[data-a]");
+  const t=e.target.closest("[data-tab],[data-s],[data-g],[data-a],[data-set],[data-jump]");
   if(!t)return;
   const d=t.dataset;
+  if(d.jump){const el=$(d.jump);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});return}
   ANIM=!!(d.tab||d.g);
-  if(d.tab||d.g){tab=d.tab||d.g;window.scrollTo(0,0)}
+  if(d.tab||d.g){tab=d.tab||d.g;window.scrollTo(0,0);if(tab==="dia"&&AUTH)sync()}
   else if(d.s){setCur(+d.s);if(tab==="spr"){ANIM=true;window.scrollTo(0,0)}}
+  else if(d.set){const k=d.set,v=d.v;SET[k]=k==="size"?+v:(k==="hint"||k==="calm")?v==="1":v;saveSet();applySet()}
+  else if(d.a==="forgetplace"){PLACE=null;WX=null;try{localStorage.removeItem("apple-place")}catch(x){}}
+  else if(d.a==="cleardiary"){if(!confirm("Delete all your saved sprays?"))return;D.forEach(g=>g.id&&TOMB.push(g.id));store("apple-tomb",TOMB);D=[];saveD();if(AUTH)sync()}
+  else if(d.a==="resetset"){if(!confirm("Reset all settings?"))return;SET={...DEF};TANK=SET.tank;saveSet();applySet()}
+  else if(["login","signup","forgot","saveprof","delacc"].includes(d.a)){acct(d.a);return}
+  else if(d.a==="syncnow"){sync();return}
+  else if(d.a==="logout"){AUTH=null;store("apple-auth",null);SYNC=""}
+  else if(d.a==="install"){if(INST){INST.prompt();INST.userChoice.then(()=>{INST=null;ANIM=false;render()})}return}
+  else if(d.a==="hideinst"){hideInst=true;try{localStorage.setItem("apple-inst","1")}catch(x){}}
   else if(d.a==="gps"){gps();return}
   else if(d.a==="add"){
     const p=$("dp").value.trim();
     if(!p||!$("dd").value){alert("Please enter the date and the product.");return}
-    D.unshift({date:$("dd").value,block:$("db").value.trim(),st:$("ds").value,p,dose:$("dq").value.trim(),note:$("dn").value.trim(),d:phi(p)});saveD();
+    D.unshift({id:"d"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),date:$("dd").value,block:$("db").value.trim(),st:$("ds").value,p,dose:$("dq").value.trim(),note:$("dn").value.trim(),d:phi(p)});saveD();if(AUTH)sync();
   }else if(d.a==="del"){
     if(!confirm("Delete this entry?"))return;
-    D.splice(+d.i,1);saveD();
+    const g=D.splice(+d.i,1)[0];if(g&&g.id){TOMB.push(g.id);store("apple-tomb",TOMB)}saveD();if(AUTH)sync();
   }
   render();
 });
-document.addEventListener("input",e=>{if(e.target.id==="ws")setCur(+e.target.value);if(e.target.id==="wt"){TANK=Math.max(1,+e.target.value||100);try{localStorage.setItem("apple-tank",TANK)}catch(x){}}if(tab==="wx"&&$("wo"))calcW()});
+document.addEventListener("input",e=>{if(e.target.id==="ws")setCur(+e.target.value);if(e.target.id==="wt"){TANK=Math.max(1,+e.target.value||100);SET.tank=TANK;saveSet()}if(e.target.id==="st-tank"){TANK=SET.tank=Math.max(1,+e.target.value||100);saveSet()}if(e.target.id==="st-heat"){SET.heat=Math.max(1,+e.target.value||30);saveSet()}if(tab==="wx"&&$("wo"))calcW()});
 document.addEventListener("change",e=>{if(e.target.id==="wp"&&PL[e.target.value]){ANIM=false;setPlace({name:e.target.value,lat:PL[e.target.value][0],lon:PL[e.target.value][1]});render()}});
 render();
+if(AUTH)sync();
 </script>
 </body>
 </html>
