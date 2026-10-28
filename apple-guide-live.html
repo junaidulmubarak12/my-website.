@@ -75,6 +75,7 @@ label{display:block;font-weight:700;margin:14px 0 4px}
 input,select,textarea{width:100%;min-height:48px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;font:inherit;background:var(--bg);color:var(--ink)}
 .verdict{padding:18px;border-radius:24px;margin-top:14px}.go{background:var(--ok)}.wait{background:var(--wait)}.stop{background:var(--stop)}
 .rw small{display:block;color:var(--mut);font-size:.8rem}.rw.skip{opacity:.45}.dz{text-align:right;flex:0 0 40%}.dz b{white-space:normal}
+.navrow{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;border:0;background:var(--card);border-radius:24px;padding:18px;margin-top:14px;box-shadow:var(--sh);font:inherit;color:var(--ink);text-align:left;cursor:pointer}.navrow b{display:block}
 .set{display:flex;flex-direction:column;gap:10px;padding:14px 0;border-top:1px solid var(--line)}.set b{display:block}
 .seg{display:flex;background:var(--line);border-radius:999px;padding:3px}.seg button{flex:1;border:0;background:none;color:var(--ink);font:inherit;font-weight:600;border-radius:999px;min-height:40px;cursor:pointer}.seg button.on{background:var(--green);color:var(--on)}
 .nohint .hi{display:none}.calm *,.calm *:before,.calm *:after{animation:none!important;transition:none!important}
@@ -110,7 +111,7 @@ const ST=[
 {n:9,t:"Fruit development II",fn:"If rain is forecast, spray one of:",f:"Difenoconazole 25EC (30ml)|Flusilazole 40EC (20ml)|Penconazole 10EC (50ml)|Trifloxystrobin + Tebuconazole 75WG (40g)|Fluopyram 17.7% + Tebuconazole 17.7% 400SC (50ml)|Fluxapyroxad 250g/l + Pyraclostrobin 250g/l 500SC (20ml)|Fluxapyroxad 75g/l + Difenoconazole 50g/l SC (30ml)|Chlorothalonil 40% + Difenoconazole 4% 44SC (180ml)|Mancozeb 63% + Carbendazim 12% WP (250g)|Trifloxystrobin 10% + Difenoconazole 12.25% + Sulphur 3% SC (90ml)",ni:"Insects:",i:"Chlorpyriphos 20EC (100ml)|Quinalphos 25EC (100ml)|Thiacloprid 21.7SC (40ml)|Summer spray oil (750ml)",nm:"Mites:",m:"Hexythiazox 5.45EC (40ml)|Fenazaquin 10EC (40ml)|Spiromesifen 22.9SC (40ml)|Propargite 42% + Hexythiazox 2% EC (100ml)|Etoxazole 10SC (110ml)|Summer spray oil (750ml)",c:"Second calcium chloride spray (3–4 g/litre). If a tree’s leaves fade or look different from similar trees, inspect roots and collar for rot, scrape dead wood and follow the package of practices. Irrigate as needed; de-weed tree basins."},
 {n:10,t:"Fruit development III",fn:"If rain is forecast, spray one of these before the rains:",f:"Mancozeb 75WP (300g)|Zineb 75WP (300g)|Ziram 80WP (200g)|Ziram 27SC (600ml)|Chlorothalonil 75WP (150g)|Mancozeb 75WG (300g)",ni:"Insects, need based:",i:"Chlorpyriphos 20EC (100ml)|Quinalphos 25EC (100ml)|Thiacloprid 21.7SC (40ml)|Neem oil 1500 ppm (300ml), then after 4 days Lecanicillium lecanii or Metarhizium anisopliae (500g)",nm:"Mites, when more than 10 per leaf:",m:"Fenazaquin 10EC (40ml)|Cyenopyrafen 30SC (30ml)|Etoxazole 10SC (110ml)",c:"Avoid spraying under wet and hot conditions; it can burn the leaves. Keep mite and aphid numbers low to avoid Alternaria leaf blotch and sooty mould. Fruit fly: methyl eugenol traps, 25–40 per hectare. Third calcium chloride spray, last 1/3 urea, potassium sulphate 4–5 g/litre for colour if needed."},
 {n:11,t:"Fruit development IV",fn:"If Alternaria leaf blotch or scab is present, spray one of:",f:"Zineb 68% + Hexaconazole 4% 72WP (125g)|Hexaconazole 5EC (50ml)|Myclobutanil 10WP (70g)|Metiram 55% + Pyraclostrobin 5% 60WG (100g)|Pyraclostrobin 12.8% + Boscalid 25.2% WG (30g)",ni:"For sooty blotch or fly speck, spray one of:",i:"Mancozeb 75WP (300g)|Ziram 27SC (600ml)|Propineb 70WP (300g)|Ziram 80WP (200g)|Mancozeb 75WG (300g)",c:"Avoid spraying immediately after heavy rains, especially in low-altitude areas. Collect fallen fruit, de-weed tree basins, stake heavy branches, harvest early varieties early."},
-{n:12,t:"Pre-harvest",x:"Check the waiting periods before you spray. The table in the Learn tab lists Propineb at 29 days and Ziram at 17 days, and the guide’s general rule says to stop sprays 3–4 weeks before harvest. Ask a SKUAST-K or Horticulture Department expert before spraying at this stage.",fn:"For long-term storage, the guide lists one of these fungicides 15–20 days before harvest:",f:"Captan 50WP (300g)|Propineb 70WP (300g)|Ziram 80WP (200g)|Zineb 75WP (300g)",c:"Need based: NAA (10 ppm) against pre-harvest fruit drop, second potassium sulphate spray (4–5 g/litre) for colour, calcium chloride (3–4 g/litre) for storage life. Cut orchard grass and remove water shoots."},
+{n:12,t:"Pre-harvest",x:"Check the waiting periods before you spray. The waiting-period table in Settings, under Learn, lists Propineb at 29 days and Ziram at 17 days, and the guide’s general rule says to stop sprays 3–4 weeks before harvest. Ask a SKUAST-K or Horticulture Department expert before spraying at this stage.",fn:"For long-term storage, the guide lists one of these fungicides 15–20 days before harvest:",f:"Captan 50WP (300g)|Propineb 70WP (300g)|Ziram 80WP (200g)|Zineb 75WP (300g)",c:"Need based: NAA (10 ppm) against pre-harvest fruit drop, second potassium sulphate spray (4–5 g/litre) for colour, calcium chloride (3–4 g/litre) for storage life. Cut orchard grass and remove water shoots."},
 {n:13,t:"Harvest",c:"No sprays. Maturity checks: starch index 2.5 for CA storage and 3.5 for table use, fruit skin more than 75% red, TSS 12–14 Brix, pressure 16–18 lb per square inch, seeds more than 75% dark brown, days after full bloom (depends on variety)."},
 {n:14,t:"Post-harvest",ni:"Insects, need based:",i:"Chlorpyriphos 20EC (100ml)|Essential where apple blotch leaf miner is a problem: Quinalphos 25EC (100ml)",nm:"Mites, when more than 20 per leaf:",m:"Fenazaquin 10EC (40ml)|Etoxazole 10SC (110ml)",c:"Collect and destroy fallen leaves, mummified fruits and dead wood. Spray 3–4% urea when half the leaves have turned yellow in scab or Alternaria infected orchards. Close anti-hail nets, tighten trellis wires, stake branches against snow, test the soil."},
 {n:15,t:"Dormancy",c:"Prune virus-infected trees last and sterilize the tools. Apply fungicidal paste on pruning wounds. If the urea spray was missed in autumn, spray 5% urea on the orchard floor. Scrape cankers and apply paste. Keep the orchard clean."}
@@ -120,9 +121,9 @@ const PHI={hexaconazole:10,fluxapyroxad:14,difenoconazole:15,pyraclostrobin:25,z
 
 
 const KEY=["Apply horticultural mineral oil before green tip. No fungicide yet.","Spray a fungicide only before rain. If the next 7 days are dry, skip it.","Same rule as green tip: spray before rain, and skip it if the next 7 days are dry.","The key stage for primary scab. Spray when most flowers are at pink stage.","Do not spray during flowering. One exception: 10 days since the last fungicide and rain is forecast.","Spray a fungicide before rains, and remove scab-infected leaves.","Spray before rains. Remove scab-infected fruits.","Spray a fungicide if rain is forecast. Treat mites only above 10 per leaf.","Spray a fungicide if rain is forecast. Check roots and collar for rot.","Spray before rains, but not in wet and hot weather.","Spray only if scab, Alternaria leaf blotch, sooty blotch or fly speck is present.","Check the waiting periods first. Some listed fungicides need more days than the guide’s spray window.","No sprays. Check that the fruit is mature.","Collect fallen leaves. Spray urea when half the leaves turn yellow in scab orchards.","No sprays. Prune, paste the wounds and keep the orchard clean."];
-const IC={stage:'<path d="M12 3c-4 3-6 6-6 9a6 6 0 0 0 12 0c0-3-2-6-6-9z"/><path d="M12 9v9"/>',spr:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',wx:'<path d="M7 18a4 4 0 0 1 0-8 5 5 0 0 1 9.600-1A4.500 4.500 0 0 1 17 18H7z"/>',dia:'<path d="M6 3h11a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6z"/><path d="M9 3v18M12 8h4"/>',learn:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.500v.5"/>'};
-const TABS=[["stage","Home"],["spr","Sprays"],["wx","Weather"],["dia","Diary"],["learn","Learn"]];
-let tab="stage",cur=4;
+const IC={stage:'<path d="M12 3c-4 3-6 6-6 9a6 6 0 0 0 12 0c0-3-2-6-6-9z"/><path d="M12 9v9"/>',spr:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',wx:'<path d="M7 18a4 4 0 0 1 0-8 5 5 0 0 1 9.600-1A4.500 4.500 0 0 1 17 18H7z"/>',dia:'<path d="M6 3h11a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6z"/><path d="M9 3v18M12 8h4"/>',set:'<path d="M12 8.500a3.500 3.500 0 1 0 0 7 3.500 3.500 0 0 0 0-7z"/><path d="M19.400 13a7.500 7.500 0 0 0 0-2l2-1.500-2-3.400-2.300 1a7.600 7.600 0 0 0-1.700-1L15 3.500h-4l-.4 2.600a7.600 7.600 0 0 0-1.700 1l-2.300-1-2 3.400 2 1.500a7.500 7.500 0 0 0 0 2l-2 1.500 2 3.400 2.300-1c.5.400 1.100.7 1.700 1l.4 2.600h4l.4-2.600c.6-.3 1.200-.6 1.700-1l2.300 1 2-3.400z"/>'};
+const TABS=[["stage","Home"],["spr","Sprays"],["wx","Weather"],["dia","Diary"],["set","Settings"]];
+let tab="stage",sub="",cur=4;
 try{cur=+localStorage.getItem("apple-stage")||4}catch(e){}
 const setCur=n=>{cur=n;try{localStorage.setItem("apple-stage",n)}catch(e){}};
 
@@ -148,7 +149,7 @@ const wicon=c=>c===0?`<svg viewBox="0 0 48 48" class="wi"><circle cx="24" cy="24
 
 function homeView(){
   const s=ST[cur-1];
-  return `<div class="gr"><div><span class="m">${greet()}${PROF.name?", "+esc(PROF.name):""}</span><h1>Assalamu alaikum</h1></div><button class="round" data-g="learn" aria-label="Safety notes and about">${LOGO}</button></div>
+  return `<div class="gr"><div><span class="m">${greet()}${PROF.name?", "+esc(PROF.name):""}</span><h1>Assalamu alaikum</h1></div><button class="round" data-g="set" data-sub="learn" aria-label="Learn: safety notes and waiting periods">${LOGO}</button></div>
   <div class="chips" id="strip">${ST.map(x=>`<button class="chip${x.n===cur?" on":""}" data-s="${x.n}"><img src="${IMG[x.n]}" alt="">${esc(x.t)}</button>`).join("")}</div>
   <div class="card stage"><img src="${IMG[s.n]}" alt="${esc(s.t)}"><div class="tx"><span class="m">Stage ${s.n} of 15</span><h2>${esc(s.t)}</h2><p class="lead">${esc(KEY[cur-1])}</p><button class="btn" data-g="spr">See sprays and doses</button></div></div>
   <div class="card" id="wcard"></div><div class="tiles" id="htiles"></div>
@@ -266,7 +267,7 @@ function wcardHTML(w){
   return head+(WX&&WX.old?`<div class="call" style="margin-top:12px"><b>Old forecast.</b> There is no internet, so this is the forecast saved at ${tm(WX.t)}. Check the weather again when you are online before you spray.</div>`:"")+`<div class="wt"><div><div class="big"><span data-count="${t}">${t}</span>°C</div><div class="m">${x.cond}</div></div>${wicon(c.weather_code)}</div>
   <div class="mets">${[[ICO.hum,c.relative_humidity_2m+"%","Humidity"],[ICO.wind,Math.round(c.wind_speed_10m)+" km/h","Wind"],[ICO.rain,(c.precipitation||0)+" mm","Rain now"],[ICO.next,x.n24.toFixed(1)+" mm","Next 24 h"]].map(m=>`<div>${m[0]}<b>${m[1]}</b><span>${m[2]}</span></div>`).join("")}</div>
   <div class="sun"><svg viewBox="0 0 200 84" aria-hidden="true"><path class="arc" d="${P}"/>${sun}</svg><div><span>Sunrise ${tm(d.sunrise[0])}</span><span>Sunset ${tm(d.sunset[0])}</span></div></div>
-  ${tab==="wx"?d.time.map((q,k)=>`<div class="rw"><span>${new Date(q+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}</span><b>${(d.precipitation_sum[k]||0).toFixed(1)} mm rain, high ${Math.round(d.temperature_2m_max[k])}°C</b></div>`).join("")+`<p class="m">Rain of 1 mm or more counts as rain. The guide gives no number for heat, so this page treats ${SET.heat}°C or more as hot (change this in Learn, under Settings).</p>`:""}`;
+  ${tab==="wx"?d.time.map((q,k)=>`<div class="rw"><span>${new Date(q+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})}</span><b>${(d.precipitation_sum[k]||0).toFixed(1)} mm rain, high ${Math.round(d.temperature_2m_max[k])}°C</b></div>`).join("")+`<p class="m">Rain of 1 mm or more counts as rain. The guide gives no number for heat, so this page treats ${SET.heat}°C or more as hot (change this in Settings).</p>`:""}`;
 }
 function tilesHTML(w){
   const x=w&&wxIn(w);let v="–",lab="Choose a place";
@@ -346,7 +347,7 @@ function diaView(){
 const seg=(k,o)=>`<div class="seg">${o.map(x=>`<button class="${SET[k]===x[0]?"on":""}" data-set="${k}" data-v="${x[0]}">${x[1]}</button>`).join("")}</div>`;
 function settingsHTML(){
   const row=(t,d,c)=>`<div class="set"><div><b>${t}</b><span class="m">${d}</span></div>${c}</div>`;
-  return `<div class="sec" id="settings"><h3>Settings</h3><p class="m">The recommended choices are already selected. Your choices are saved on this phone.</p>
+  return `<div class="sec" id="settings"><h3>Account and preferences</h3><p class="m">The recommended choices are already selected. Your choices are saved on this phone.</p>
   ${accHTML()}
   ${row("Text size","Larger text is easier to read in sunlight. Large is recommended.",seg("size",[[1,"Normal"],[1.15,"Large"],[1.3,"Extra large"]]))}
   ${row("Screen colours","Auto follows your phone. Dark is easier on the eyes at night.",seg("theme",[["auto","Auto"],["light","Light"],["dark","Dark"]]))}
@@ -360,7 +361,7 @@ function settingsHTML(){
   <div class="set"><div><b>About this guide</b><span class="m">Kashmir Apple Guide, version 1. Spray information copied in October 2026 from the SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026. It has not yet been reviewed by an expert.</span></div></div></div>`;
 }
 function learnView(){
-  return `<h1>Learn</h1><div class="wh" style="margin-top:10px"><button class="pill alt" data-jump="settings">Go to Settings</button></div>
+  return `<div class="pn"><button data-g="set">Back to Settings</button></div><h1>Learn</h1>
   <div class="sec"><h3>Scab</h3><p class="m">What the guide says. Photos and symptom descriptions will be added after expert review.</p><ul>
   <li>Pink bud is the crucial stage for primary scab infection. Keep the orchard clean and drained.</li>
   <li>At petal fall, remove all scab-infected leaves before the rains start.</li>
@@ -389,7 +390,12 @@ function learnView(){
   <li>Do not move pesticide to another container. Do not use leaking equipment. Ask an expert if unsure.</li></ul></details>
   <details><summary>Waiting period before harvest</summary><p class="m">Do not harvest fruit, cut grass or let poultry or livestock into the orchard until the waiting period after the last spray is complete.</p>
   <table>${Object.keys(PHI).map(k=>`<tr><td>${k[0].toUpperCase()+k.slice(1)}</td><td>${PHI[k]} days</td></tr>`).join("")}</table>
-  <p class="m">Zineb is not in the guide’s table. Check its label.</p></details>${settingsHTML()}`;
+  <p class="m">Zineb is not in the guide’s table. Check its label.</p></details>`;
+}
+function setView(){
+  if(sub==="learn")return learnView();
+  return `<h1>Settings</h1>
+  <button class="navrow" data-g="set" data-sub="learn"><span><b>Learn</b><span class="m">Scab, leaf miner, safety rules and waiting periods</span></span><svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>${settingsHTML()}`;
 }
 
 const FOOT=`<p class="foot">Photos and spray guidance: SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026. This page repeats the guide and may contain copying errors. Check the original and ask a Plant Protection officer before you spray. Use and sale of products depend on CIB &amp; RC registration and label claim.</p>`;
@@ -495,7 +501,7 @@ function accHTML(){
 function render(){
   $("tabs").innerHTML=TABS.map(t=>`<button class="${t[0]===tab?"on":""}" data-tab="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[t[0]]}</svg>${t[1]}</button>`).join("");
   const v=$("v");v.className=ANIM?"anim":"";
-  v.innerHTML=topBanners()+({stage:homeView,spr:sprView,wx:wxView,dia:diaView,learn:learnView}[tab])()+FOOT;
+  v.innerHTML=topBanners()+({stage:homeView,spr:sprView,wx:wxView,dia:diaView,set:setView}[tab])()+FOOT;
   [...v.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,8)));
   if(tab==="stage"||tab==="wx"){fillWx();ensureWx()}
   const on=document.querySelector(".chip.on"),sp=$("strip");
@@ -508,7 +514,7 @@ document.addEventListener("click",e=>{
   const d=t.dataset;
   if(d.jump){const el=$(d.jump);if(el)el.scrollIntoView({behavior:"smooth",block:"start"});return}
   ANIM=!!(d.tab||d.g);
-  if(d.tab||d.g){tab=d.tab||d.g;window.scrollTo(0,0);if(tab==="dia"&&AUTH)sync()}
+  if(d.tab||d.g){tab=d.tab||d.g;sub=d.sub||"";window.scrollTo(0,0);if(tab==="dia"&&AUTH)sync()}
   else if(d.s){setCur(+d.s);if(tab==="spr"){ANIM=true;window.scrollTo(0,0)}}
   else if(d.set){const k=d.set,v=d.v;SET[k]=k==="size"?+v:(k==="hint"||k==="calm")?v==="1":v;saveSet();applySet()}
   else if(d.a==="forgetplace"){PLACE=null;WX=null;try{localStorage.removeItem("apple-place")}catch(x){}}
