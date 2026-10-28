@@ -1,0 +1,14 @@
+{
+  "name": "Kashmir Apple Guide",
+  "short_name": "Apple Guide",
+  "description": "Spray guide for apple growers, based on the SKUAST-K guide 2026.",
+  "start_url": "./apple-guide-live.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f1f1ec",
+  "theme_color": "#17805a",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
