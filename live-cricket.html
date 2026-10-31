@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-LXPT3uMELDh67/GpdgfzwZcR6hOBo7IjmR5I78BmTDs='; style-src 'unsafe-inline'; img-src 'self' data:; connect-src https://*.firebaseio.com https://*.firebasedatabase.app; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Live Cricket Scorer</title>
+<style>
+  :root { --pitch:#1f4d36; --dark:#153827; --ball:#b3202a; --paper:#f5f7f4; --line:#d5ddd6; --ink:#1c2420; --muted:#5d6b63; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 "Segoe UI",Arial,sans-serif; }
+  header { background:var(--dark); color:#fff; text-align:center; padding:14px; }
+  header h1 { margin:0; font:1.5rem Georgia,serif; }
+  main { max-width:900px; margin:0 auto; padding:12px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:14px; margin-bottom:14px; }
+  h2 { margin:0 0 10px; font:1.1rem Georgia,serif; color:var(--pitch); }
+  label { display:block; font-weight:600; margin:8px 0 3px; }
+  input, select, textarea { width:100%; padding:8px; border:1px solid var(--line); border-radius:5px; font:inherit; }
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  button { font:inherit; cursor:pointer; border-radius:6px; border:1px solid var(--pitch); background:#fff; color:var(--pitch); padding:10px 14px; }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline:3px solid #f0b429; outline-offset:1px; }
+  .go { background:var(--pitch); color:#fff; margin-top:12px; width:100%; }
+
+  .board { background:var(--pitch); color:#fff; border-radius:8px; padding:14px; margin-bottom:14px; }
+  .board .big { font:2.4rem Georgia,serif; line-height:1.1; }
+  .board small { color:#cfe0d5; }
+  .now { display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; margin-top:10px; }
+  .now div { display:flex; justify-content:space-between; border-bottom:1px solid var(--line); padding:3px 0; }
+  .over { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .over span { min-width:34px; height:34px; padding:0 6px; border-radius:17px; background:var(--paper); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-weight:700; }
+  .over span.w { background:var(--ball); color:#fff; border-color:var(--ball); }
+
+  .pad { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .pad button { height:62px; font-size:1.5rem; font-weight:700; }
+  .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; margin-top:8px; }
+  .row .x.on { background:#f0b429; border-color:#f0b429; color:#000; }
+  .row .w { background:var(--ball); border-color:var(--ball); color:#fff; font-weight:700; }
+  .hint { color:var(--muted); margin:8px 0 0; }
+  .wk { border:1px solid var(--ball); border-radius:6px; padding:10px; margin-top:10px; }
+  .wk button { margin-top:10px; margin-right:6px; }
+  .res { font:1.3rem Georgia,serif; color:var(--ball); margin:0; }
+  .bar { display:flex; gap:8px; margin-bottom:14px; }
+  .bar button { flex:1; }
+
+  .scroll { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; min-width:420px; }
+  th, td { padding:5px 6px; border-bottom:1px solid var(--line); text-align:right; font-size:.92rem; }
+  th { background:var(--paper); color:var(--muted); }
+  .l { text-align:left; }
+  .m { color:var(--muted); }
+  .note { font-size:.9rem; color:var(--muted); margin:8px 0 0; }
+
+  .nav { display:flex; gap:8px; margin-bottom:12px; }
+  .nav button { flex:1; font-weight:600; }
+  .nav .on { background:var(--pitch); color:#fff; }
+  .board .venue { margin-top:6px; }
+  .board a { color:#fff; font-weight:600; }
+  .pl { display:flex; justify-content:space-between; gap:10px; }
+  .pl p { margin:6px 0 0; }
+  .pb { display:flex; flex-direction:column; gap:6px; }
+  .plain { background:#fff; color:var(--pitch); }
+</style>
+</head>
+<body>
+<header><h1>Live Cricket Scorer</h1></header>
+<main id="app"></main>
+
+<script>
+const KEY = "live-cricket-v1";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+const ovs = b => Math.floor(b / 6) + "." + (b % 6);
+
+const DBHOST = /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)*\.(firebaseio\.com|firebasedatabase\.app)$/;
+const CODE = /^[a-z0-9]{6}$/;
+const MAPHOSTS = new Set(["www.google.com", "google.com", "maps.google.com", "maps.app.goo.gl", "goo.gl", "www.openstreetmap.org", "maps.apple.com"]);
+const params = new URLSearchParams(location.search);
+const WANT = params.get("watch");
+const WATCH = CODE.test(WANT || "") ? WANT : null;   // only a plain 6-character match code is accepted
+let S = null;                        // the whole match
+let ui = { x: null, wk: false };     // x = extra selected (wd, nb, b, lb), wk = wicket form open
+if (!WATCH) { try { S = cleanMatch(JSON.parse(localStorage.getItem(KEY))); } catch (e) {} }
+
+const cleanUrl = u => (u || "").trim().replace(/\/+$/, "");
+const validDb = u => DBHOST.test(u);
+/* Everything read from storage or from the database is untrusted. cleanMatch rebuilds it from plain, bounded values. */
+const HOW = ["bowled", "caught", "lbw", "run out", "stumped", "hit wicket"], XS = ["", "wd", "nb", "b", "lb"];
+const str = (v, n) => typeof v === "string" ? v.slice(0, n) : "";
+const int = (v, a, b, d) => { v = typeof v === "number" || typeof v === "string" ? Number(v) : NaN; return Number.isInteger(v) && v >= a && v <= b ? v : d; };
+function cleanMatch(o) {
+  if (!o || typeof o !== "object" || !Array.isArray(o.ev)) return null;
+  const names = [0, 1].map(i => str(o.names && o.names[i], 40) || "Team " + (i + 1));
+  const p = [0, 1].map(t => Array.from({ length: 11 }, (_, i) => str(o.p && o.p[t] && o.p[t][i], 40) || "Player " + (i + 1)));
+  const ev = [0, 1].map(k => (Array.isArray(o.ev[k]) ? o.ev[k] : []).slice(0, 1500).map(e => {
+    if (!e || typeof e !== "object") return null;
+    if (e.t === "open") { const s = int(e.s, 0, 10, -1), n = int(e.n, 0, 10, -1); return s < 0 || n < 0 || s === n ? null : { t: "open", s, n }; }
+    if (e.t === "bowler") { const b = int(e.b, 0, 10, -1); return b < 0 ? null : { t: "bowler", b }; }
+    if (e.t === "newbat") { const w = int(e.who, 0, 10, -1); return w < 0 ? null : { t: "newbat", who: w }; }
+    if (e.t === "ball") {
+      if (!XS.includes(e.x || "")) return null;
+      const w = e.w && typeof e.w === "object" && HOW.includes(e.w.how) ? { how: e.w.how, who: e.w.who === "n" ? "n" : "s", f: str(e.w.f, 40) } : undefined;
+      return { t: "ball", r: int(e.r, 0, 12, 0), x: e.x || undefined, w };
+    }
+    return null;
+  }).filter(Boolean));
+  const db = cleanUrl(typeof o.db === "string" ? o.db : "");
+  return { names, p, ev, overs: int(o.overs, 1, 100, 20), maxb: int(o.maxb, 1, 100, 4), first: o.first ? 1 : 0, cur: o.cur ? 1 : 0,
+    venue: str(o.venue, 100), map: str(o.map, 500), code: CODE.test(o.code || "") ? o.code : "", db: validDb(db) ? db : "" };
+}
+const savedDb = () => { try { return localStorage.getItem("live-cricket-db") || ""; } catch (e) { return ""; } };
+
+// Scorer: send the match to the online database after every tap
+function publish() {
+  if (WATCH || !S || !S.db) return;
+  fetch(`${S.db}/matches/${S.code}.json`, { method: "PUT", body: JSON.stringify(JSON.stringify(S)) }).catch(() => {});
+}
+function save() {
+  if (WATCH) return;
+  try { S ? localStorage.setItem(KEY, JSON.stringify(S)) : localStorage.removeItem(KEY); } catch (e) {}
+  publish();
+}
+// Viewer: fetch the latest match every few seconds
+async function pull() {
+  try {
+    const dbp = cleanUrl(params.get("db"));
+    if (!validDb(dbp)) { $("app").innerHTML = '<div class="card">This link is not valid.</div>'; return; }
+    const r = await fetch(`${dbp}/matches/${WATCH}.json`);
+    const d = await r.json();
+    S = typeof d === "string" ? cleanMatch(JSON.parse(d)) : null;
+  } catch (e) { /* network hiccup: keep showing the last score */ }
+  render();
+}
+
+const batTeam = k => (k === 0 ? S.first : 1 - S.first);
+const pn = (t, i) => S.p[t][i];
+
+/* Every tap is stored as an event. The scorecard is rebuilt from the events,
+   so Undo simply removes the last event. */
+function replay(k) {
+  const bt = batTeam(k), wt = 1 - bt;
+  const tgt = k === 1 ? replay(0).runs + 1 : null;
+  const st = {
+    bt, wt, tgt, runs: 0, wk: 0, legal: 0, ex: { wd: 0, nb: 0, b: 0, lb: 0 },
+    B: Array.from({ length: 11 }, () => ({ r: 0, b: 0, f: 0, s: 0, out: null, in: false })),
+    W: {}, s: null, n: null, bw: null, last: null, ovr: 0, tok: [], fow: []
+  };
+  for (const e of S.ev[k]) {
+    if (e.t === "open") { st.s = e.s; st.n = e.n; st.B[e.s].in = st.B[e.n].in = true; }
+    else if (e.t === "bowler") { st.bw = e.b; st.ovr = 0; st.tok = []; st.W[e.b] = st.W[e.b] || { b: 0, m: 0, r: 0, w: 0 }; }
+    else if (e.t === "newbat") { if (st.s === null) st.s = e.who; else st.n = e.who; st.B[e.who].in = true; }
+    else ball(st, e);
+  }
+  st.over = st.wk >= 10 || st.legal >= S.overs * 6 || (tgt !== null && st.runs >= tgt);
+  return st;
+}
+
+function ball(st, e) {
+  const x = e.x || "", R = +e.r || 0;
+  let tot = R, bat = R, chg = R, legal = true, faced = true;
+  if (x === "wd") { tot = chg = 1 + R; bat = 0; legal = faced = false; st.ex.wd += tot; }
+  else if (x === "nb") { tot = chg = 1 + R; legal = false; st.ex.nb += 1; }
+  else if (x === "b" || x === "lb") { bat = 0; chg = 0; st.ex[x] += R; }
+
+  const sId = st.s, nId = st.n, B = st.B[sId], W = st.W[st.bw];
+  st.runs += tot;
+  if (faced) B.b++;
+  B.r += bat;
+  if (bat === 4) B.f++;
+  if (bat === 6) B.s++;
+  W.r += chg; st.ovr += chg;
+  if (legal) { st.legal++; W.b++; }
+
+  let tk = x === "wd" ? "Wd" + (R ? "+" + R : "") : x === "nb" ? "Nb" + (R ? "+" + R : "")
+         : x === "b" ? "B" + R : x === "lb" ? "LB" + R : "" + R;
+
+  if (R % 2) [st.s, st.n] = [st.n, st.s];          // odd runs: batters cross
+
+  if (e.w) {
+    const out = e.w.who === "n" ? nId : sId, how = e.w.how, f = (e.w.f || "").trim(), bn = pn(st.wt, st.bw);
+    st.wk++;
+    if (how !== "run out") W.w++;
+    st.B[out].out = how === "caught" ? `c ${f || "fielder"} b ${bn}` : how === "stumped" ? `st ${f || "keeper"} b ${bn}`
+      : how === "run out" ? `run out${f ? " (" + f + ")" : ""}` : how === "lbw" ? `lbw b ${bn}`
+      : how === "hit wicket" ? `hit wicket b ${bn}` : `b ${bn}`;
+    if (st.s === out) st.s = null; else st.n = null;
+    st.fow.push(`${st.runs}-${st.wk} (${pn(st.bt, out)}, ${ovs(st.legal)} ov)`);
+    tk = tk === "0" ? "W" : tk + "W";
+  }
+  st.tok.push(tk);
+
+  if (legal && st.legal % 6 === 0) {                // over finished
+    [st.s, st.n] = [st.n, st.s];
+    if (st.ovr === 0) W.m++;
+    st.last = st.bw; st.bw = null;
+  }
+}
+
+function result() {
+  const a = replay(0), b = replay(1);
+  if (b.runs > a.runs) return `${S.names[b.bt]} won by ${10 - b.wk} wickets`;
+  if (b.runs === a.runs) return "Match tied";
+  return `${S.names[a.bt]} won by ${a.runs - b.runs} runs`;
+}
+
+/* ---------- Screens ---------- */
+function setupHTML() {
+  const team = i => `<div><label>Team ${i + 1} name</label><input id="n${i}" value="Team ${i ? "B" : "A"}">
+    <label>Playing XI (one name per line)</label><textarea id="p${i}" rows="11" placeholder="Player 1&#10;Player 2&#10;..."></textarea></div>`;
+  return `<div class="card"><h2>New match</h2>
+    <div class="grid2">${team(0)}${team(1)}</div>
+    <label>Match venue</label><input id="ve" placeholder="e.g. Town Cricket Ground, City name">
+    <label>Exact location link (optional)</label><input id="vm" placeholder="Paste the Share link from Google Maps">
+    <p class="note">Without a link, the venue name is searched on the map. A pasted link is more accurate.</p>
+    <label>Overs per innings</label><input id="ov" type="number" min="1" value="20">
+    <label>Max overs per bowler (empty = one fifth of the innings)</label><input id="mb" type="number" min="1">
+    <label>Live sharing: Firebase database URL (optional)</label>
+    <input id="db" placeholder="https://your-project-default-rtdb.firebaseio.com" value="${esc(savedDb())}">
+    <label>Batting first</label><select id="first"><option value="0">Team 1</option><option value="1">Team 2</option></select>
+    <button class="go" data-a="start">Start match</button></div>`;
+}
+
+function card(k) {
+  const st = replay(k), bt = st.bt, wt = st.wt, x = st.ex, xt = x.wd + x.nb + x.b + x.lb;
+  const bats = st.B.map((b, i) => b.in ? `<tr><td class="l">${esc(pn(bt, i))}${(i === st.s || i === st.n) && !st.over ? "*" : ""}</td>
+    <td class="l m">${b.out ? esc(b.out) : "not out"}</td><td>${b.r}</td><td>${b.b}</td><td>${b.f}</td><td>${b.s}</td>
+    <td>${b.b ? (b.r / b.b * 100).toFixed(1) : "-"}</td></tr>` : "").join("");
+  const dnb = st.B.map((b, i) => b.in ? "" : pn(bt, i)).filter(Boolean).join(", ");
+  const bowls = Object.entries(st.W).map(([i, w]) => `<tr><td class="l">${esc(pn(wt, i))}</td><td>${ovs(w.b)}</td><td>${w.m}</td>
+    <td>${w.r}</td><td>${w.w}</td><td>${w.b ? (w.r / (w.b / 6)).toFixed(2) : "-"}</td></tr>`).join("");
+  return `<div class="card"><h2>${esc(S.names[bt])}: ${st.runs}/${st.wk} (${ovs(st.legal)} ov)</h2>
+    <div class="scroll"><table><tr><th class="l">Batter</th><th class="l">How out</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>${bats}</table></div>
+    <p class="note">Extras ${xt} (wd ${x.wd}, nb ${x.nb}, b ${x.b}, lb ${x.lb}). ${dnb ? "Did not bat: " + esc(dnb) + "." : ""}</p>
+    ${st.fow.length ? `<p class="note">Fall of wickets: ${esc(st.fow.join(", "))}</p>` : ""}
+    <h2 style="margin-top:14px">${esc(S.names[wt])} bowling</h2>
+    <div class="scroll"><table><tr><th class="l">Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Econ</th></tr>${bowls}</table></div></div>`;
+}
+
+// Only accept real web links, so nobody can sneak a harmful link into a shared match
+function mapLink() {
+  try { const u = new URL(S.map); if (u.protocol === "https:" && MAPHOSTS.has(u.hostname)) return u.href; } catch (e) {}
+  return S.venue ? "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(S.venue) : "";
+}
+
+function matchHTML() {
+  if (!S) return WATCH ? `<div class="card">Waiting for the match to start. This page updates by itself.</div>` : setupHTML();
+  const k = S.cur, st = replay(k), bt = st.bt, wt = st.wt;
+  const sel = (id, t, f) => `<select id="${id}">${S.p[t].map((n, i) => f(i) ? `<option value="${i}">${esc(n)}</option>` : "").join("")}</select>`;
+  const started = S.ev[k].some(e => e.t === "open");
+  const crr = st.legal ? (st.runs / (st.legal / 6)).toFixed(2) : "0.00";
+
+  let sub = `${ovs(st.legal)}/${S.overs} overs, run rate ${crr}`;
+  if (st.tgt !== null && !st.over) sub += `<br>Target ${st.tgt}. Need ${st.tgt - st.runs} from ${S.overs * 6 - st.legal} balls`;
+
+  let ctl;
+  if (st.over) {
+    ctl = k === 0 ? `<h2>Innings over: ${st.runs}/${st.wk}</h2><p>${esc(S.names[replay(0).wt])} need ${st.runs + 1} to win.</p>
+      <button class="go" data-a="next">Start 2nd innings</button>` : `<p class="res">${esc(result())}</p>`;
+  } else if (!started) {
+    ctl = `<h2>Choose opening batters</h2><label>Striker</label>${sel("o1", bt, () => 1)}
+      <label>Non-striker</label>${sel("o2", bt, () => 1)}<button class="go" data-a="open">Confirm</button>`;
+  } else if (st.s === null || st.n === null) {
+    ctl = `<h2>Wicket. Choose the new batter</h2>${sel("nsel", bt, i => !st.B[i].in)}<button class="go" data-a="newbat">Confirm</button>`;
+  } else if (st.bw === null) {
+    ctl = `<h2>${st.legal ? "New over: choose the bowler" : "Choose the opening bowler"}</h2>
+      ${sel("bsel", wt, i => i !== st.last && !(st.W[i] && st.W[i].b >= S.maxb * 6))}
+      <p class="note">Each bowler can bowl up to ${S.maxb} overs. Bowlers who finished their overs are hidden.</p>
+      <button class="go" data-a="bowler">Confirm</button>`;
+  } else {
+    const names = { wd: "Wide", nb: "No ball", b: "Bye", lb: "Leg bye" };
+    ctl = `<div class="pad">${[0, 1, 2, 3, 4, 6].map(v => `<button data-a="run" data-v="${v}">${v}</button>`).join("")}</div>
+      <div class="row">${Object.keys(names).map(v => `<button class="x${ui.x === v ? " on" : ""}" data-a="ex" data-v="${v}">${names[v]}</button>`).join("")}
+      <button class="w" data-a="wkopen">Wicket</button></div>
+      ${ui.x ? `<p class="hint">${names[ui.x]} selected. Tap the runs scored (0 = only the extra).</p>` : ""}
+      ${ui.wk ? `<div class="wk"><label>How out</label><select id="how">${["bowled", "caught", "lbw", "run out", "stumped", "hit wicket"].map(h => `<option>${h}</option>`).join("")}</select>
+        <label>Who is out</label><select id="who"><option value="s">${esc(pn(bt, st.s))} (striker)</option><option value="n">${esc(pn(bt, st.n))} (non-striker)</option></select>
+        <label>Runs completed on this ball</label><select id="wr">${[0, 1, 2, 3].map(v => `<option>${v}</option>`).join("")}</select>
+        <label>Fielder (optional)</label><input id="fld">
+        <button class="go" style="width:auto" data-a="wkok">Confirm wicket</button><button data-a="wkx">Cancel</button></div>` : ""}`;
+  }
+
+  const bs = i => i === null ? "-" : `${esc(pn(bt, i))} ${st.B[i].r} (${st.B[i].b})`;
+  const bw = st.bw === null ? null : st.W[st.bw];
+  const live = started && !st.over ? `<div class="card"><strong>This over</strong>
+      <div class="over">${st.tok.map(t => `<span class="${t.includes("W") ? "w" : ""}">${t}</span>`).join("") || "<span>-</span>"}</div>
+      <div class="now"><div><span>Striker*</span><b>${bs(st.s)}</b></div><div><span>Non-striker</span><b>${bs(st.n)}</b></div>
+      <div><span>Bowler</span><b>${bw ? esc(pn(wt, st.bw)) + " " + ovs(bw.b) + "-" + bw.m + "-" + bw.r + "-" + bw.w : "-"}</b></div></div></div>` : "";
+
+  if (WATCH) ctl = st.over ? (k === 0 ? "<h2>Innings break</h2>" : `<p class="res">${esc(result())}</p>`) : "";
+
+  const link = location.href.split("?")[0].split("#")[0] + "?watch=" + S.code + "&db=" + encodeURIComponent(S.db || "");
+  const share = S.db ? `<div class="card"><strong>Share the live score</strong>
+      <p class="note">Send this link to friends. It works after this page is uploaded to GitHub Pages.</p>
+      <input readonly data-sel value="${esc(link)}"></div>` : "";
+
+  const venue = mapLink() ? `<div class="venue"><a href="${esc(mapLink())}" target="_blank" rel="noopener">&#128205; ${esc(S.venue || "Match location")}: open in Maps</a></div>` : "";
+
+  return `<div class="board"><small>Innings ${k + 1}${WATCH ? " (live)" : ""}</small><div>${esc(S.names[bt])}</div>
+      <div class="big">${st.runs}/${st.wk}</div><small>${sub}</small>${venue}</div>
+    ${live}${ctl ? `<div class="card">${ctl}</div>` : ""}
+    ${WATCH ? "" : `<div class="bar"><button data-a="undo">Undo last</button><button data-a="reset">New match</button></div>${share}`}
+    ${card(k)}${k === 1 ? card(0) : ""}`;
+}
+
+/* ---------- Players menu: profiles saved in this browser ---------- */
+const PKEY = "live-cricket-players";
+const ROLES = ["Batter", "Bowler", "All-rounder", "Wicket-keeper"];
+let P = [];
+try { P = JSON.parse(localStorage.getItem(PKEY)) || []; } catch (e) {}
+const saveP = () => { try { localStorage.setItem(PKEY, JSON.stringify(P)); } catch (e) {} };
+let view = "match", editId = null;
+
+function playersHTML() {
+  const e = P.find(p => p.id === editId) || {};
+  const f = (id, label, v, ph) => `<label>${label}</label><input id="${id}" value="${esc(v)}" placeholder="${ph || ""}">`;
+  const form = `<div class="card"><h2>${e.id ? "Edit player" : "Add a player"}</h2>
+    <div class="grid2">
+      <div>${f("pn", "Name *", e.name)}${f("pno", "Jersey number", e.no)}${f("pc", "City or team", e.city)}</div>
+      <div><label>Role</label><select id="pr">${ROLES.map(r => `<option${r === e.role ? " selected" : ""}>${r}</option>`).join("")}</select>
+        ${f("pb", "Batting style", e.bat, "Right-hand bat")}${f("pw", "Bowling style", e.bowl, "Right-arm fast")}</div>
+    </div>
+    <label>About</label><textarea id="pa" rows="4" placeholder="Favourite shot, best score, anything about the player">${esc(e.about)}</textarea>
+    <button class="go" data-a="psave">Save player</button>
+    ${e.id ? `<button class="go plain" data-a="pcancel">Cancel</button>` : ""}</div>`;
+  const list = P.length ? P.map(p => `<div class="card pl"><div><b>${esc(p.name)}</b>${p.no ? " #" + esc(p.no) : ""}<br>
+      <span class="m">${[p.role, p.city, p.bat, p.bowl].filter(Boolean).map(esc).join(" &middot; ")}</span>
+      ${p.about ? `<p>${esc(p.about)}</p>` : ""}</div>
+      <div class="pb"><button data-a="pedit" data-v="${esc(p.id)}">Edit</button><button data-a="pdel" data-v="${esc(p.id)}">Delete</button></div></div>`).join("")
+    : `<p class="note">No players saved yet. Add the first one above.</p>`;
+  return form + `<h2>Saved players (${P.length})</h2>` + list +
+    `<p class="note">Profiles are saved in this browser on this device only.</p>`;
+}
+
+const navHTML = () => `<div class="nav">
+  <button class="${view === "match" ? "on" : ""}" data-a="view" data-v="match">Match</button>
+  <button class="${view === "players" ? "on" : ""}" data-a="view" data-v="players">Players</button></div>`;
+
+function render() {
+  let body;
+  try { body = view === "players" && !WATCH ? playersHTML() : matchHTML(); }
+  catch (e) { body = '<div class="card">This match could not be shown.</div>'; }
+  $("app").innerHTML = (WATCH ? "" : navHTML()) + body;
+  if ($("o2")) $("o2").selectedIndex = 1;
+}
+
+/* ---------- Buttons ---------- */
+const A = {
+  start() {
+    const names = [0, 1].map(i => $("n" + i).value.trim() || "Team " + (i + 1));
+    const p = [0, 1].map(i => {
+      const l = $("p" + i).value.split("\n").map(s => s.trim()).filter(Boolean);
+      return Array.from({ length: 11 }, (_, j) => l[j] || "Player " + (j + 1));
+    });
+    const overs = Math.max(1, +$("ov").value || 20);
+    const maxb = Math.max(+$("mb").value || Math.ceil(overs / 5), Math.ceil(overs / 10));
+    const db0 = cleanUrl($("db").value), db = validDb(db0) ? db0 : "";
+    if (db0 && !db) alert("That is not a Firebase database address, so live sharing is switched off.");
+    try { localStorage.setItem("live-cricket-db", db); } catch (e) {}
+    S = { names, p, overs, maxb, db, venue: $("ve").value.trim(), map: $("vm").value.trim(), code: Math.random().toString(36).slice(2, 8), first: +$("first").value, cur: 0, ev: [[], []] };
+  },
+  run(v) { S.ev[S.cur].push({ t: "ball", r: +v, x: ui.x || undefined }); ui.x = null; },
+  ex(v) { ui.x = ui.x === v ? null : v; },
+  wkopen() { ui.wk = true; },
+  wkx() { ui.wk = false; },
+  wkok() {
+    S.ev[S.cur].push({ t: "ball", r: +$("wr").value, x: ui.x || undefined, w: { how: $("how").value, who: $("who").value, f: $("fld").value } });
+    ui.x = null; ui.wk = false;
+  },
+  undo() {
+    ui.x = null; ui.wk = false;
+    if (!S.ev[S.cur].length && S.cur === 1) S.cur = 0; else S.ev[S.cur].pop();
+  },
+  open() {
+    const s = +$("o1").value, n = +$("o2").value;
+    if (s === n) { alert("Pick two different batters."); return; }
+    S.ev[S.cur].push({ t: "open", s, n });
+  },
+  bowler() { S.ev[S.cur].push({ t: "bowler", b: +$("bsel").value }); },
+  newbat() { S.ev[S.cur].push({ t: "newbat", who: +$("nsel").value }); },
+  next() { S.cur = 1; },
+  view(v) { view = v; editId = null; },
+  psave() {
+    const name = $("pn").value.trim();
+    if (!name) { alert("Please enter the player's name."); return; }
+    const d = { name, no: $("pno").value.trim(), city: $("pc").value.trim(), role: $("pr").value,
+                bat: $("pb").value.trim(), bowl: $("pw").value.trim(), about: $("pa").value.trim() };
+    const old = P.find(p => p.id === editId);
+    if (old) Object.assign(old, d); else P.unshift({ id: Date.now().toString(36), ...d });
+    editId = null; saveP();
+  },
+  pedit(v) { editId = v; window.scrollTo(0, 0); },
+  pdel(v) { if (confirm("Delete this player?")) { P = P.filter(p => p.id !== v); saveP(); } },
+  pcancel() { editId = null; },
+  reset() { if (confirm("Delete this match and start a new one?")) { S = null; ui = { x: null, wk: false }; } }
+};
+
+$("app").addEventListener("click", e => {
+  const b = e.target.closest("[data-a]");
+  if (!b) return;
+  A[b.dataset.a](b.dataset.v);
+  if (!["view", "psave", "pedit", "pdel", "pcancel"].includes(b.dataset.a)) save();
+  render();
+});
+
+document.addEventListener("focusin", e => { if (e.target.dataset && e.target.dataset.sel !== undefined) e.target.select(); });
+
+if (WANT && !WATCH) {
+  $("app").innerHTML = '<div class="card">This link is not valid.</div>';
+} else if (WATCH) {
+  document.querySelector("header h1").textContent = "Live Score";
+  pull();
+  setInterval(pull, 4000);
+} else {
+  render();
+  publish();
+}
+</script>
+</body>
+</html>

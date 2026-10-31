@@ -1,8 +1,9 @@
 // Kashmir Apple Guide: keeps the guide available without internet.
 // Security notes: only our own named files are stored, only successful answers are stored,
 // and weather, accounts and every other address always go straight to the internet.
-const V = "apple-guide-v3";
+const V = "apple-guide-v4";
 const FILES = ["apple-guide-live.html", "app.js", "config.js", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
+for (let i = 1; i <= 15; i++) FILES.push("img/stage-" + i + ".jpg", "img/t-" + i + ".jpg");
 const ALLOWED = new Set(FILES.map(f => new URL(f, self.registration.scope).pathname));
 
 self.addEventListener("install", e => {

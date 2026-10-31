@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-2EQSKETAEgMtrl11q8BiVFmLaTVlTBtAeeMz313+Gp8='; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cricket Scorecard</title>
+<style>
+  :root {
+    --pitch: #1f4d36;
+    --pitch-dark: #153827;
+    --ball: #b3202a;
+    --paper: #f5f7f4;
+    --line: #d5ddd6;
+    --ink: #1c2420;
+    --muted: #5d6b63;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", Arial, sans-serif;
+    line-height: 1.5;
+  }
+  header {
+    background: var(--pitch-dark);
+    color: #fff;
+    padding: 22px 16px;
+    text-align: center;
+  }
+  header h1 { margin: 0; font-family: Georgia, serif; font-size: 1.8rem; }
+  header p { margin: 4px 0 0; color: #b9ccc0; font-size: .95rem; }
+  main { max-width: 980px; margin: 0 auto; padding: 16px; }
+  section { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 18px; margin-bottom: 18px; }
+  h2 { margin: 0 0 12px; font-family: Georgia, serif; font-size: 1.25rem; color: var(--pitch); }
+  h3 { margin: 18px 0 8px; font-size: 1rem; color: var(--pitch); }
+  .hint { color: var(--muted); font-size: .9rem; margin: 0 0 12px; }
+
+  /* Setup */
+  #setup { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+  .team label { display: block; font-weight: 600; margin-bottom: 4px; }
+  .team input { display: block; width: 100%; padding: 7px 9px; margin-bottom: 6px; border: 1px solid var(--line); border-radius: 5px; font-size: .95rem; }
+  .team input.tname { font-weight: 600; border-color: var(--pitch); }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tab { padding: 9px 16px; border: 1px solid var(--pitch); background: #fff; color: var(--pitch); border-radius: 6px; cursor: pointer; font-size: .95rem; }
+  .tab.on { background: var(--pitch); color: #fff; }
+  .tab:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #f0b429; outline-offset: 1px; }
+
+  /* Tables */
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 640px; }
+  th, td { padding: 5px 6px; border-bottom: 1px solid var(--line); text-align: right; font-size: .92rem; }
+  th { background: var(--paper); color: var(--muted); font-weight: 600; }
+  th:first-child, td:first-child, td.left, th.left { text-align: left; }
+  td.nm { font-weight: 600; white-space: nowrap; }
+  td input, td select { width: 100%; padding: 5px; border: 1px solid var(--line); border-radius: 4px; font-size: .9rem; }
+  td input[type=number] { width: 62px; text-align: right; }
+  td input.w { min-width: 130px; }
+  td.calc { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+  /* Totals */
+  #total { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; background: var(--pitch); color: #fff; padding: 12px 14px; border-radius: 6px; margin-top: 12px; }
+  #total .big { font-family: Georgia, serif; font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+  .extras { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+  .extras input { width: 70px; padding: 5px; border: 1px solid var(--line); border-radius: 4px; }
+  #result { margin-top: 14px; padding: 12px 14px; border-left: 5px solid var(--ball); background: #fbeeee; font-weight: 600; }
+  #result:empty { display: none; }
+  .actions { text-align: center; padding-bottom: 30px; }
+  .actions button { padding: 9px 18px; border: 1px solid var(--ball); background: #fff; color: var(--ball); border-radius: 6px; cursor: pointer; font-size: .95rem; margin: 0 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Cricket Scorecard</h1>
+  <p>Enter both teams, then fill in batting and bowling. Totals update by themselves.</p>
+</header>
+
+<main>
+  <section>
+    <h2>1. Playing XI</h2>
+    <p class="hint">Type the team names and the 11 players of each team.</p>
+    <div id="setup"></div>
+  </section>
+
+  <section>
+    <h2>2. Scorecard</h2>
+    <div class="tabs" id="tabs"></div>
+    <div id="sheet"></div>
+    <div id="result"></div>
+  </section>
+
+  <div class="actions">
+    <button id="print">Print scorecard</button>
+    <button id="reset">Clear everything</button>
+  </div>
+</main>
+
+<script>
+const OUT = ["not out", "bowled", "caught", "lbw", "run out", "stumped", "hit wicket", "retired", "did not bat"];
+const NOT_WICKET = ["not out", "retired", "did not bat"];
+const KEY = "cricket-scorecard-v1";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+const num = v => parseFloat(v) || 0;
+
+function blank() {
+  return {
+    teams: [
+      { name: "Team A", players: Array(11).fill("") },
+      { name: "Team B", players: Array(11).fill("") }
+    ],
+    inn: [0, 1].map(() => ({
+      bat: Array.from({ length: 11 }, () => ({ out: "did not bat", by: "", runs: "", balls: "", f: "", s: "" })),
+      bowl: Array.from({ length: 6 }, () => ({ p: "", o: "", m: "", r: "", w: "" })),
+      extras: ""
+    }))
+  };
+}
+
+let state = blank();
+let cur = 0;
+
+const num4 = v => { v = String(v ?? ""); return /^\d{0,4}(\.\d)?$/.test(v) ? v : ""; };
+function cleanState(o) {   // saved data is untrusted: rebuild it from plain, bounded values
+  const s = blank();
+  try {
+    [0, 1].forEach(t => {
+      s.teams[t].name = String(o.teams[t].name).slice(0, 40);
+      s.teams[t].players = Array.from({ length: 11 }, (_, i) => String(o.teams[t].players[i] ?? "").slice(0, 40));
+      const a = o.inn[t], d = s.inn[t];
+      d.extras = num4(a.extras);
+      d.bat = d.bat.map((r, i) => { const x = a.bat[i] || {}; return { out: OUT.includes(x.out) ? x.out : "did not bat", by: String(x.by ?? "").slice(0, 60), runs: num4(x.runs), balls: num4(x.balls), f: num4(x.f), s: num4(x.s) }; });
+      d.bowl = d.bowl.map((r, i) => { const x = a.bowl[i] || {}; return { p: /^([0-9]|10)?$/.test(String(x.p ?? "")) ? String(x.p ?? "") : "", o: num4(x.o), m: num4(x.m), r: num4(x.r), w: num4(x.w) }; });
+    });
+  } catch (e) { return blank(); }
+  return s;
+}
+try {
+  const saved = localStorage.getItem(KEY);
+  if (saved) state = cleanState(JSON.parse(saved));
+} catch (e) { /* storage not available: continue without saving */ }
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+const pname = (t, i) => state.teams[t].players[i].trim() || "Player " + (i + 1);
+const tname = t => state.teams[t].name.trim() || "Team " + (t + 1);
+const toBalls = o => { o = num(o); const w = Math.floor(o); return w * 6 + Math.round((o - w) * 10); };
+const toOvers = b => Math.floor(b / 6) + "." + (b % 6);
+
+function renderSetup() {
+  $("setup").innerHTML = state.teams.map((t, ti) => `
+    <div class="team">
+      <label>Team ${ti + 1} name</label>
+      <input class="tname" data-t="${ti}" data-k="name" value="${esc(t.name)}">
+      ${t.players.map((p, i) => `<input data-t="${ti}" data-i="${i}" placeholder="Player ${i + 1}" value="${esc(p)}">`).join("")}
+    </div>`).join("");
+}
+
+function renderTabs() {
+  $("tabs").innerHTML = [0, 1].map(i =>
+    `<button class="tab${i === cur ? " on" : ""}" data-i="${i}">Innings ${i + 1}: ${esc(tname(i))} batting</button>`
+  ).join("");
+}
+
+function renderSheet() {
+  const bt = cur, bw = 1 - cur, a = state.inn[cur];
+
+  const batRows = a.bat.map((r, i) => `
+    <tr>
+      <td class="nm">${esc(pname(bt, i))}</td>
+      <td class="left"><select data-g="bat" data-r="${i}" data-k="out">
+        ${OUT.map(o => `<option${o === r.out ? " selected" : ""}>${o}</option>`).join("")}
+      </select></td>
+      <td class="left"><input class="w" data-g="bat" data-r="${i}" data-k="by" value="${esc(r.by)}" placeholder="c Ali b Khan"></td>
+      ${["runs", "balls", "f", "s"].map(k =>
+        `<td><input type="number" min="0" data-g="bat" data-r="${i}" data-k="${k}" value="${esc(r[k])}"></td>`).join("")}
+      <td class="calc" id="sr${i}">-</td>
+    </tr>`).join("");
+
+  const options = r => `<option value="">Select bowler</option>` +
+    state.inn[cur].bat.map((_, i) => `<option value="${i}"${String(i) === r.p ? " selected" : ""}>${esc(pname(bw, i))}</option>`).join("");
+
+  const bowlRows = a.bowl.map((r, i) => `
+    <tr>
+      <td class="left"><select data-g="bowl" data-r="${i}" data-k="p">${options(r)}</select></td>
+      <td><input type="number" min="0" step="0.1" data-g="bowl" data-r="${i}" data-k="o" value="${esc(r.o)}"></td>
+      ${["m", "r", "w"].map(k =>
+        `<td><input type="number" min="0" data-g="bowl" data-r="${i}" data-k="${k}" value="${esc(r[k])}"></td>`).join("")}
+      <td class="calc" id="eco${i}">-</td>
+    </tr>`).join("");
+
+  $("sheet").innerHTML = `
+    <h3>${esc(tname(bt))} batting</h3>
+    <div class="scroll"><table>
+      <tr><th>Batter</th><th class="left">Status</th><th class="left">Details</th><th>Runs</th><th>Balls</th><th>4s</th><th>6s</th><th>SR</th></tr>
+      ${batRows}
+    </table></div>
+    <div class="extras"><label for="ex">Extras (wides, no-balls, byes)</label>
+      <input id="ex" type="number" min="0" data-g="ex" value="${esc(a.extras)}"></div>
+    <div id="total"></div>
+
+    <h3>${esc(tname(bw))} bowling</h3>
+    <div class="scroll"><table>
+      <tr><th>Bowler</th><th>Overs</th><th>Maidens</th><th>Runs</th><th>Wickets</th><th>Econ</th></tr>
+      ${bowlRows}
+    </table></div>`;
+  calc();
+}
+
+function inningsTotal(n) {
+  const a = state.inn[n];
+  const runs = a.bat.reduce((s, r) => s + num(r.runs), 0) + num(a.extras);
+  const wkts = a.bat.filter(r => !NOT_WICKET.includes(r.out)).length;
+  const balls = state.inn[1 - n].bowl.reduce((s, r) => s + toBalls(r.o), 0);
+  return { runs, wkts, balls };
+}
+
+function calc() {
+  const a = state.inn[cur];
+  a.bat.forEach((r, i) => {
+    const b = num(r.balls);
+    $("sr" + i).textContent = b ? (num(r.runs) / b * 100).toFixed(1) : "-";
+  });
+  a.bowl.forEach((r, i) => {
+    const b = toBalls(r.o);
+    $("eco" + i).textContent = b ? (num(r.r) / (b / 6)).toFixed(2) : "-";
+  });
+
+  // Total for this innings comes from the bowling figures of the other side
+  const bowlBalls = a.bowl.reduce((s, r) => s + toBalls(r.o), 0);
+  const t = inningsTotal(cur);
+  const tb = state.inn[cur].bowl.reduce((s, r) => s + toBalls(r.o), 0);
+  $("total").innerHTML = `
+    <span>${esc(tname(cur))}</span>
+    <span class="big">${t.runs}/${t.wkts}</span>
+    <span>Overs bowled: ${toOvers(tb || bowlBalls)}</span>`;
+
+  const t1 = inningsTotal(0), t2 = inningsTotal(1);
+  let msg = "";
+  if (t1.runs > 0 && (t2.runs > 0 || t2.wkts > 0)) {
+    if (t2.runs > t1.runs) msg = `${tname(1)} won by ${10 - t2.wkts} wickets`;
+    else if (t2.wkts >= 10) msg = t2.runs === t1.runs ? "Match tied" : `${tname(0)} won by ${t1.runs - t2.runs} runs`;
+    else msg = `${tname(1)} need ${t1.runs - t2.runs + 1} more runs to win`;
+  }
+  $("result").textContent = msg;
+}
+
+// Typing in the playing XI
+$("setup").addEventListener("input", e => {
+  const d = e.target.dataset;
+  if (d.k === "name") state.teams[d.t].name = e.target.value;
+  else if (d.i !== undefined) state.teams[d.t].players[d.i] = e.target.value;
+  save();
+  renderTabs();
+  renderSheet();
+});
+
+// Typing in the scorecard
+$("sheet").addEventListener("input", e => {
+  const d = e.target.dataset;
+  if (!d.g) return;
+  const a = state.inn[cur];
+  if (d.g === "ex") a.extras = e.target.value;
+  else a[d.g][d.r][d.k] = e.target.value;
+  save();
+  calc();
+});
+
+// Switching innings
+$("tabs").addEventListener("click", e => {
+  const b = e.target.closest(".tab");
+  if (!b) return;
+  cur = Number(b.dataset.i);
+  renderTabs();
+  renderSheet();
+});
+
+$("print").addEventListener("click", () => window.print());
+$("reset").addEventListener("click", () => {
+  if (!confirm("Clear all teams, players and scores?")) return;
+  state = blank();
+  save();
+  cur = 0;
+  renderSetup();
+  renderTabs();
+  renderSheet();
+});
+
+renderSetup();
+renderTabs();
+renderSheet();
+</script>
+</body>
+</html>
