@@ -39,16 +39,48 @@ let tab="stage",sub="",cur=4;
 try{cur=+localStorage.getItem("apple-stage")||4}catch(e){}
 const setCur=n=>{cur=n;try{localStorage.setItem("apple-stage",n)}catch(e){}};
 
-const rowH=x=>{x=x.trim();const m=x.match(/^(.*?)\s*\(([^()]*)\)$/);return m&&m[1].length<90&&!/then/.test(x)?`<div class="rw"><span>${esc(m[1])}</span><b>${esc(m[2])}</b></div>`:`<div class="rw"><span>${esc(x)}</span></div>`};
+const rowH=x=>{x=x.trim();const m=x.match(/^(.*?)\s*\(([^()]*)\)$/);return m&&m[1].length<90&&!/then|phir /.test(x)?`<div class="rw"><span>${esc(m[1])}</span><b>${esc(m[2])}</b></div>`:`<div class="rw"><span>${esc(x)}</span></div>`};
 const list=s=>s?s.split("|").map(rowH).join(""):"";
 const sec=(h,n,l)=>(n||l)?`<div class="sec"><h3>${h}</h3>${n?`<p>${esc(n)}</p>`:""}${list(l)}</div>`:"";
 
 
-const DEF={size:1,theme:"auto",hint:true,calm:false,heat:30,tank:100};
-const cleanSet=o=>{o=o&&typeof o==="object"?o:{};return{size:[1,1.15,1.3].includes(+o.size)?+o.size:1,theme:["auto","light","dark"].includes(o.theme)?o.theme:"auto",hint:o.hint!==false,calm:o.calm===true,heat:CL(o.heat,1,60,30),tank:CL(o.tank,1,5000,100)}};
+const ST_EN=JSON.parse(JSON.stringify(ST)),KEY_EN=KEY.slice();
+function applyLang(){
+  const hi=SET.lang==="hi"&&typeof ST_HI!=="undefined";
+  ST.forEach((s,i)=>["t","fn","ni","nm","c","x","i","m"].forEach(k=>{const o=hi?ST_HI[i][k]:undefined,e=ST_EN[i][k];if(o!==undefined)s[k]=o;else if(e===undefined)delete s[k];else s[k]=e}));
+  KEY.forEach((_,i)=>{KEY[i]=hi&&KEY_HI[i]?KEY_HI[i]:KEY_EN[i]});
+}
+const DEF={size:1,theme:"auto",lang:"en",calm:false,heat:30,tank:100};
+const cleanSet=o=>{o=o&&typeof o==="object"?o:{};return{size:[1,1.15,1.3].includes(+o.size)?+o.size:1,theme:["auto","light","dark"].includes(o.theme)?o.theme:"auto",lang:o.lang==="hi"?"hi":"en",calm:o.calm===true,heat:CL(o.heat,1,60,30),tank:CL(o.tank,1,5000,100)}};
 let SET=cleanSet(null);try{SET=cleanSet(JSON.parse(localStorage.getItem("apple-settings")))}catch(e){}
 const saveSet=()=>{SET=cleanSet(SET);try{localStorage.setItem("apple-settings",JSON.stringify(SET))}catch(e){}};
-function applySet(){const r=document.documentElement;r.style.setProperty("--fs",SET.size);SET.theme==="auto"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",SET.theme);document.body.classList.toggle("nohint",!SET.hint);r.classList.toggle("calm",!!SET.calm)}
+function tr(s){
+  if(SET.lang!=="hi"||typeof HI==="undefined"||typeof s!=="string")return s;
+  const k=s.trim();if(!k)return s;
+  let r=Object.prototype.hasOwnProperty.call(HI,k)?HI[k]:undefined;
+  if(r===undefined)for(const p of HIP){const m=k.match(p[0]);if(m){r=p[1](m);break}}
+  return r===undefined?s:s.replace(k,()=>r);
+}
+const t=tr,ATTRS=["placeholder","aria-label","alt","title"];
+function trEl(el){for(const a of ATTRS){const v=el.getAttribute&&el.getAttribute(a);if(v){const x=tr(v);if(x!==v)el.setAttribute(a,x)}}}
+function trText(n){const p=n.parentNode&&n.parentNode.nodeName;if(p==="SCRIPT"||p==="STYLE"||p==="TEXTAREA")return;const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v}
+function trTree(root){
+  if(SET.lang!=="hi")return;
+  if(root.nodeType===3){trText(root);return}
+  if(root.nodeType!==1)return;
+  trEl(root);
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT);let n;
+  while(n=w.nextNode()){if(n.nodeType===3)trText(n);else trEl(n)}
+}
+new MutationObserver(ms=>{
+  if(SET.lang!=="hi")return;
+  for(const m of ms){
+    if(m.type==="characterData")trText(m.target);
+    else if(m.type==="attributes")trEl(m.target);
+    else m.addedNodes.forEach(trTree);
+  }
+}).observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATTRS});
+function applySet(){const r=document.documentElement;r.style.setProperty("--fs",SET.size);SET.theme==="auto"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",SET.theme);document.body.classList.toggle("hinglish",SET.lang==="hi");r.lang=SET.lang==="hi"?"hi-Latn":"en";applyLang();r.classList.toggle("calm",!!SET.calm)}
 applySet();
 const OSRM=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const rm=()=>OSRM||SET.calm;
@@ -139,7 +171,7 @@ const canSpray=(s,rain,gap)=>s===5?rain&&gap>=10:(s===2||s===3||(s>=6&&s<=10))?r
 let TANK=SET.tank;
 const ACT=Object.keys(PHI).concat(["zineb","neem","quinalphos","chlorpyriphos","thiacloprid","fenazaquin","etoxazole","cyenopyrafen","carbendazim","sulphur"]);
 function recRow(x,last,tank,s){
-  x=x.trim();const m=x.match(/^(.*?)\s*\(([^()]*)\)$/),ok=m&&m[1].length<90&&!/then/.test(x);
+  x=x.trim();const m=x.match(/^(.*?)\s*\(([^()]*)\)$/),ok=m&&m[1].length<90&&!/then|phir /.test(x);
   const name=ok?m[1]:x,dose=ok?m[2]:"",q=x.toLowerCase();
   const same=ACT.some(k=>q.includes(k)&&last.includes(k)),w=phi(x),dm=dose.match(/^([\d.]+)\s*(g|ml|l)$/i);
   const big=dm&&tank!==100?`${+(dm[1]*tank/100).toFixed(1)} ${dm[2].toLowerCase()==="l"?"L":dm[2].toLowerCase()}`:dose;
@@ -251,9 +283,9 @@ async function loadWx(){
   LOAD=false;fillWx();
 }
 function gps(){
-  if(!navigator.geolocation){alert("This phone does not share its location. Choose a place from the list.");return}
+  if(!navigator.geolocation){alert(t("This phone does not share its location. Choose a place from the list."));return}
   navigator.geolocation.getCurrentPosition(p=>{setPlace({name:"Your location",lat:+p.coords.latitude.toFixed(3),lon:+p.coords.longitude.toFixed(3)});render()},
-    ()=>alert("Could not get your location. Allow location access, or choose a place from the list."),{timeout:15000});
+    ()=>alert(t("Could not get your location. Allow location access, or choose a place from the list.")),{timeout:15000});
 }
 function counts(){
   document.querySelectorAll("[data-count]").forEach(el=>{
@@ -300,7 +332,7 @@ function settingsHTML(){
   ${accHTML()}
   ${row("Text size","Larger text is easier to read in sunlight. Large is recommended.",seg("size",[[1,"Normal"],[1.15,"Large"],[1.3,"Extra large"]]))}
   ${row("Screen colours","Auto follows your phone. Dark is easier on the eyes at night.",seg("theme",[["auto","Auto"],["light","Light"],["dark","Dark"]]))}
-  ${row("Hinglish hints","Short Hinglish lines under the English. Recommended: On.",seg("hint",[[true,"On"],[false,"Off"]]).replace(/data-v="true"/,'data-v="1"').replace(/data-v="false"/,'data-v="0"'))}
+  ${row("Language","Choose the language of the whole guide. Hinglish is Hindi written in English letters.",seg("lang",[["en","English"],["hi","Hinglish"]]))}
   ${row("Animations","Turn off to save battery on an older phone. Recommended: On.",seg("calm",[[false,"On"],[true,"Off"]]).replace(/data-v="true"/,'data-v="1"').replace(/data-v="false"/,'data-v="0"'))}
   ${row("Install on this phone",standalone()?"Already installed. After the first visit with internet, the guide also opens without signal.":"After you open the guide once with internet, it works without signal. Live weather still needs internet. Android: Chrome menu, then Install app. iPhone: Share, then Add to Home Screen.",INST?`<div class="wh"><button class="pill" data-a="install">Install</button></div>`:"")}
   ${row("My place for the weather",PLACE?esc(PLACE.name):"Not chosen yet",`<div class="wh"><button class="pill alt" data-g="wx">Change</button>${PLACE?`<button class="pill alt" data-a="forgetplace">Forget</button>`:""}</div>`)}
@@ -456,7 +488,7 @@ async function acct(kind){
     }else if(kind==="saveprof"){
       PROF={name:S_($("ac-name").value.trim(),60)};store("apple-profile",PROF);await sync();m("Saved.");
     }else if(kind==="delacc"){
-      if(!confirm("Delete your account and your online diary? This cannot be undone."))return;
+      if(!confirm(t("Delete your account and your online diary? This cannot be undone.")))return;
       await fetch(await nodeUrl(),{method:"DELETE"});await fb("delete",{idToken:await token()});
       AUTH=null;store("apple-auth",null);SYNC="";render();
     }
@@ -479,7 +511,7 @@ function welcomeHTML(){
   const dots=`<div class="dots" aria-hidden="true">${[0,1,2,3].map(i=>`<i class="${i===wstep?"on":""}"></i>`).join("")}</div>`;
   const opts=Object.keys(PL).map(k=>`<option${PLACE&&PLACE.name===k?" selected":""}>${k}</option>`).join("")+(PLACE&&!PL[PLACE.name]?`<option selected>${esc(PLACE.name)}</option>`:"");
   const steps=[
-    `<div class="logo">${LOGO}</div><h1>Assalamu alaikum</h1><p class="lead">This guide shows what the SKUAST-K spray schedule says for your apple trees today, using the weather where you are.</p><p class="m"><span class="hi">Aaj aapke ped ke liye kya karna hai, mausam ke saath.</span></p>`,
+    `<div class="logo">${LOGO}</div><h1>Assalamu alaikum</h1><p class="lead">This guide shows what the SKUAST-K spray schedule says for your apple trees today, using the weather where you are.</p><p class="m"><span class="hi">Aaj aapke ped ke liye kya karna hai, mausam ke saath.</span></p><div style="margin-top:16px">${seg("lang",[["en","English"],["hi","Hinglish"]])}</div>`,
     `<h2>Where is your orchard?</h2><p class="m">Used only to read the weather forecast.</p><select id="wp" class="pill wide" aria-label="Your place"><option value="">Choose a place</option>${opts}</select><button class="pill alt wide" data-a="gps" style="margin-top:10px">Use my location</button>`,
     `<h2>Which stage are your trees at?</h2><p class="m">Tap the photo that looks like your trees. You can change it any time.</p>${chipsHTML()}<img class="ph" src="${IMG[cur]}" alt="${esc(ST[cur-1].t)}" width="480" height="258"><p class="lead">${esc(ST[cur-1].t)}: ${esc(KEY[cur-1])}</p>`,
     `<h2>Use it like an app</h2><p class="m">After you open the guide once with internet, it also works without signal. Live weather still needs internet.</p>${INST?`<button class="btn" data-a="install">Install on this phone</button>`:`<p>${iOS?"Tap the Share button, then Add to Home Screen.":"Open the browser menu and choose Install app or Add to Home screen."}</p>`}`];
@@ -489,7 +521,7 @@ function render(){
   $("tabs").innerHTML=TABS.map(t=>`<button class="${t[0]===tab?"on":""}" data-tab="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[t[0]]}</svg>${t[1]}</button>`).join("");
   const v=$("v");v.className=ANIM?"anim":"";
   v.innerHTML=WELCOMED?topBanners()+({stage:homeView,spr:sprView,wx:wxView,dia:diaView,set:setView}[tab])()+FOOT:welcomeHTML();
-  $("tabs").style.display=WELCOMED?"":"none";
+  $("tabs").style.display=WELCOMED?"":"none";$("tabs").setAttribute("aria-label",SET.lang==="hi"?"Hisse":"Sections");
   [...v.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,8)));
   if(WELCOMED&&(tab==="stage"||tab==="wx")){fillWx();ensureWx()}
   const on=document.querySelector(".chip.on"),sp=$("strip");
@@ -505,10 +537,10 @@ document.addEventListener("click",e=>{
   ANIM=!!(d.tab||d.g);
   if(d.tab||d.g){tab=d.tab||d.g;sub=d.sub||"";window.scrollTo(0,0);if(tab==="dia"&&AUTH)sync()}
   else if(d.s){setCur(+d.s);if(tab==="spr"){ANIM=true;window.scrollTo(0,0)}}
-  else if(d.set){const k=d.set,v=d.v;SET[k]=k==="size"?+v:(k==="hint"||k==="calm")?v==="1":v;saveSet();applySet()}
+  else if(d.set){const k=d.set,v=d.v;SET[k]=k==="size"?+v:k==="calm"?v==="1":v;saveSet();applySet()}
   else if(d.a==="forgetplace"){PLACE=null;WX=null;try{localStorage.removeItem("apple-place")}catch(x){}}
-  else if(d.a==="cleardiary"){if(!confirm("Delete all your saved sprays?"))return;D.forEach(g=>g.id&&TOMB.push(g.id));store("apple-tomb",TOMB);D=[];saveD();if(AUTH)sync()}
-  else if(d.a==="resetset"){if(!confirm("Reset all settings?"))return;SET={...DEF};TANK=SET.tank;saveSet();applySet()}
+  else if(d.a==="cleardiary"){if(!confirm(t("Delete all your saved sprays?")))return;D.forEach(g=>g.id&&TOMB.push(g.id));store("apple-tomb",TOMB);D=[];saveD();if(AUTH)sync()}
+  else if(d.a==="resetset"){if(!confirm(t("Reset all settings?")))return;SET={...DEF};TANK=SET.tank;saveSet();applySet()}
   else if(["login","signup","forgot","saveprof","delacc"].includes(d.a)){acct(d.a);return}
   else if(d.a==="syncnow"){sync();return}
   else if(d.a==="logout"){AUTH=null;store("apple-auth",null);SYNC=""}
@@ -521,10 +553,10 @@ document.addEventListener("click",e=>{
   else if(d.a==="gps"){gps();return}
   else if(d.a==="add"){
     const p=$("dp").value.trim();
-    if(!p||!$("dd").value){alert("Please enter the date and the product.");return}
+    if(!p||!$("dd").value){alert(t("Please enter the date and the product."));return}
     D.unshift({id:newId(),date:$("dd").value,block:$("db").value.trim(),st:$("ds").value,p,dose:$("dq").value.trim(),note:$("dn").value.trim(),d:phi(p)});saveD();if(AUTH)sync();
   }else if(d.a==="del"){
-    if(!confirm("Delete this entry?"))return;
+    if(!confirm(t("Delete this entry?")))return;
     const g=D.splice(+d.i,1)[0];if(g&&g.id){TOMB.push(g.id);store("apple-tomb",TOMB)}saveD();if(AUTH)sync();
   }
   render();
