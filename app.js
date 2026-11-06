@@ -95,13 +95,14 @@ const wicon=c=>c===0?`<svg viewBox="0 0 48 48" class="wi"><circle cx="24" cy="24
  :`<svg viewBox="0 0 48 48" class="wi"><circle cx="35" cy="14" r="7" fill="#f4a261"${c>3?' opacity="0"':""}/><path d="M13 36h21a7 7 0 0 0 0-14 10 10 0 0 0-19-2 8 8 0 0 0-2 16z" fill="var(--card)" stroke="var(--mut)" stroke-width="2.5" stroke-linejoin="round"/>${c>=51?'<path d="M18 40l-2 5M26 40l-2 5M34 40l-2 5" stroke="#3b8fb0" stroke-width="3" stroke-linecap="round"/>':""}</svg>`;
 
 const chipsHTML=()=>`<div class="chips" id="strip">${ST.map(x=>`<button class="chip${x.n===cur?" on":""}" data-s="${x.n}"><img src="${TH[x.n]}" alt="" width="30" height="30" loading="lazy" decoding="async">${esc(x.t)}</button>`).join("")}</div>`;
+const rainSentence=x=>x.n24>=1?`Rain expected in the next 24 hours (${x.n24.toFixed(1)} mm).`:x.rain==="week"?"No rain in the next 24 hours, but rain later this week.":"Dry for the next 7 days.";
 function lastGap(){if(!D.length)return 7;const d=Math.floor((Date.now()-new Date(D[0].date+"T00:00:00"))/864e5);return d>=0&&d<365?d:7}
 function todayHTML(w){
   const s=ST[cur-1],foot=`<p class="m" style="margin:12px 0 0">Source: SKUAST-K Guide 2026. ${REV.name?"Reviewed by "+esc(REV.name):"Not yet reviewed by an expert"}.</p>`;
   if(!PLACE)return `<div class="card today"><span class="m">Today</span><h2>${esc(s.t)}</h2><p>Choose your place to get today’s spray advice for this stage.</p><button class="btn" data-g="wx">Choose my place</button>${foot}</div>`;
   if(!w)return `<div class="card today"><span class="m">Today</span><h2>${esc(s.t)}</h2>${ERR?`<p>The forecast could not be loaded. Check your internet connection.</p>`:`<div class="sk" style="height:64px;margin-top:10px"></div>`}${foot}</div>`;
   const x=wxIn(w),[v,o]=advise(cur,x.rain!=="dry",x.hot,x.wet,lastGap());
-  const rain=x.n24>=1?`Rain expected in the next 24 hours (${x.n24.toFixed(1)} mm).`:x.rain==="week"?"No rain in the next 24 hours, but rain later this week.":"Dry for the next 7 days.";
+  const rain=rainSentence(x);
   const T={go:"Spray before the rain",wait:"Wait and check",stop:"Do not spray today"};
   return `<div class="card today ${v}"><span class="m">Today${WX&&WX.old?" (old forecast)":""}. Wrong stage? Pick yours below.</span><h2>${esc(s.t)}</h2><div class="tv">${T[v]}</div><p>${rain}</p><p class="m">${esc(o[0][1])}</p>
   <div class="acts2"><button class="btn" data-g="spr">What to spray</button><button class="btn alt" data-g="wx">Weather details</button></div>${foot}</div>`;
@@ -259,6 +260,7 @@ function fillWx(){
   if($("htiles"))$("htiles").innerHTML=tilesHTML(w);
   if($("hrain"))$("hrain").innerHTML=rainHTML(w);
   if($("today"))$("today").innerHTML=todayHTML(w);
+  if($("wmini"))$("wmini").innerHTML=miniHTML(w);
   if(w&&$("wr")){const x=wxIn(w);$("wr").value=x.rain;$("wh").value=x.hot?"1":"0";$("ww").value=x.wet?"1":"0"}
   if($("wo"))calcW();
   counts();
@@ -507,23 +509,54 @@ function accHTML(){
   <div class="wh"><button class="pill" data-a="login">Log in</button><button class="pill alt" data-a="signup">Create account</button><button class="pill alt" data-a="forgot">Forgot password</button></div><div id="acm" class="m" role="status"></div></div>`;
 }
 
+/* ---------- Welcome: a full-screen, photo-led introduction ---------- */
+function ensureBg(){
+  const b=document.getElementById("wbg");if(!b||b.firstChild)return;
+  b.innerHTML=Array.from({length:15},(_,i)=>`<i style="--i:${i};background-image:url(${TH[i+1]})"></i>`).join("")+
+   `<svg viewBox="0 0 400 140" preserveAspectRatio="none" aria-hidden="true"><path d="M0 140V90l50-45 40 30 60-60 55 55 45-35 70 60 80-40v85z" fill="rgba(255,255,255,.07)"/><path d="M0 140V112l70-40 50 35 70-55 60 50 60-30 90 45v35z" fill="rgba(255,255,255,.11)"/></svg>`;
+}
+const rv=s=>tr(s).split(" ").map((w,i)=>`<span style="--w:${i}">${esc(w)}</span>`).join(" ");
+function miniHTML(w){
+  if(!PLACE)return `<p class="mq">Choose a place to see the live forecast.</p>`;
+  if(!w)return ERR?`<p class="mq">The forecast could not be loaded. Check your internet connection.</p>`:`<div class="sk" style="height:62px;opacity:.35"></div>`;
+  const c=w.current,x=wxIn(w),t=Math.round(c.temperature_2m);
+  return `<div class="mrow"><b>${esc(PLACE.name)}</b><span class="mtag">Live forecast</span></div><div class="mbig"><span data-count="${t}">${t}</span>°C <small>${x.cond}</small></div><p class="mq">${rainSentence(x)}</p>`;
+}
 function welcomeHTML(){
-  const dots=`<div class="dots" aria-hidden="true">${[0,1,2,3].map(i=>`<i class="${i===wstep?"on":""}"></i>`).join("")}</div>`;
-  const opts=Object.keys(PL).map(k=>`<option${PLACE&&PLACE.name===k?" selected":""}>${k}</option>`).join("")+(PLACE&&!PL[PLACE.name]?`<option selected>${esc(PLACE.name)}</option>`:"");
+  const dots=`<div class="dots" aria-hidden="true">${[0,1,2,3].map(i=>`<i class="${i<wstep?"done":i===wstep?"on":""}"></i>`).join("")}</div>`;
+  const f=(n,h)=>`<div class="fade" style="--d:${n}">${h}</div>`;
   const steps=[
-    `<div class="logo">${LOGO}</div><h1>Assalamu alaikum</h1><p class="lead">This guide shows what the SKUAST-K spray schedule says for your apple trees today, using the weather where you are.</p><p class="m"><span class="hi">Aaj aapke ped ke liye kya karna hai, mausam ke saath.</span></p><div style="margin-top:16px">${seg("lang",[["en","English"],["hi","Hinglish"]])}</div>`,
-    `<h2>Where is your orchard?</h2><p class="m">Used only to read the weather forecast.</p><select id="wp" class="pill wide" aria-label="Your place"><option value="">Choose a place</option>${opts}</select><button class="pill alt wide" data-a="gps" style="margin-top:10px">Use my location</button>`,
-    `<h2>Which stage are your trees at?</h2><p class="m">Tap the photo that looks like your trees. You can change it any time.</p>${chipsHTML()}<img class="ph" src="${IMG[cur]}" alt="${esc(ST[cur-1].t)}" width="480" height="258"><p class="lead">${esc(ST[cur-1].t)}: ${esc(KEY[cur-1])}</p>`,
-    `<h2>Use it like an app</h2><p class="m">After you open the guide once with internet, it also works without signal. Live weather still needs internet.</p>${INST?`<button class="btn" data-a="install">Install on this phone</button>`:`<p>${iOS?"Tap the Share button, then Add to Home Screen.":"Open the browser menu and choose Install app or Add to Home screen."}</p>`}`];
-  return `<div class="welcome">${dots}<div class="wbody">${steps[wstep]}</div><div class="wnav">${wstep?`<button class="pill alt" data-a="wback">Back</button>`:`<span></span>`}${wstep<3?`<button class="btn" data-a="wnext">Next</button>`:`<button class="btn" data-a="wdone">Open the guide</button>`}</div>${wstep<3?`<button class="skip" data-a="wdone">Skip</button>`:""}</div>`;
+    `<div class="eyebrow fade" style="--d:0">${LOGO}<span>Kashmir Apple Guide</span></div>
+     <h1 class="rv">${rv("The right spray, at the right time.")}</h1>
+     <p class="sub fade" style="--d:3">The SKUAST-K schedule for every stage of your season, matched to the weather in your orchard.</p>
+     <div class="fan" aria-hidden="true"><img src="${IMG[4]}" alt="" width="480" height="258"><img src="${IMG[12]}" alt="" width="480" height="258"><img src="${IMG[6]}" alt="" width="480" height="258"></div>
+     <div class="feats fade" style="--d:5"><span>15 stages</span><span>Live weather</span><span>Works offline</span></div>
+     ${f(6,seg("lang",[["en","English"],["hi","Hinglish"]]))}`,
+    `<h2 class="rv">${rv("Where is your orchard?")}</h2>
+     <p class="sub fade" style="--d:2">We read the weather there, so the advice fits your valley.</p>
+     <div class="gchips fade" style="--d:3">${Object.keys(PL).map(k=>`<button class="gchip${PLACE&&PLACE.name===k?" on":""}" data-a="place" data-v="${k}">${k}</button>`).join("")}</div>
+     <button class="gchip wide fade" style="--d:4" data-a="gps">Use my location</button>
+     <div id="wmini" class="glass fade" style="--d:5"></div>`,
+    `<h2 class="rv">${rv("Which stage are your trees at?")}</h2>
+     <p class="sub fade" style="--d:2">Tap the photo that looks like your trees. You can change it any time.</p>
+     <div class="fade" style="--d:3">${chipsHTML()}</div>
+     <div class="shot fade" style="--d:4"><img src="${IMG[cur]}" alt="${esc(ST[cur-1].t)}" width="480" height="258"><div class="cap"><span class="tag">Stage ${cur} of 15</span><h3>${esc(ST[cur-1].t)}</h3><p>${esc(KEY[cur-1])}</p></div></div>`,
+    `<h2 class="rv">${rv("You are ready for the season")}</h2>
+     <ul class="chk"><li style="--d:0"><span class="tick" aria-hidden="true">✓</span><span>Orchard place</span><b>${PLACE?esc(PLACE.name):"Not chosen yet"}</b></li>
+     <li style="--d:1"><span class="tick" aria-hidden="true">✓</span><span>Tree stage</span><b>${esc(ST[cur-1].t)}</b></li>
+     <li style="--d:2"><span class="tick" aria-hidden="true">✓</span><span>Works without internet after your first visit</span></li></ul>
+     <div class="glass fade" style="--d:5"><h3>Use it like an app</h3>${INST?`<button class="btn" data-a="install">Install on this phone</button>`:`<p class="mq">${iOS?"Tap the Share button, then Add to Home Screen.":"Open the browser menu and choose Install app or Add to Home screen."}</p>`}</div>`];
+  return `<div class="wl" role="dialog" aria-modal="true" aria-label="Welcome"><div class="wtop">${dots}${wstep<3?`<button class="skip" data-a="wdone">Skip</button>`:""}</div>
+   <div class="wmain">${steps[wstep]}</div>
+   <div class="wnav${wstep?"":" one"}">${wstep?`<button class="pill alt" data-a="wback">Back</button>`:""}${wstep===0?`<button class="btn" data-a="wnext">Get started</button>`:wstep<3?`<button class="btn" data-a="wnext">Next</button>`:`<button class="btn" data-a="wdone">Open the guide</button>`}</div></div>`;
 }
 function render(){
   $("tabs").innerHTML=TABS.map(t=>`<button class="${t[0]===tab?"on":""}" data-tab="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[t[0]]}</svg>${t[1]}</button>`).join("");
-  const v=$("v");v.className=ANIM?"anim":"";
+  const v=$("v");v.className=ANIM&&WELCOMED?"anim":"";document.body.classList.toggle("welcoming",!WELCOMED);ensureBg();
   v.innerHTML=WELCOMED?topBanners()+({stage:homeView,spr:sprView,wx:wxView,dia:diaView,set:setView}[tab])()+FOOT:welcomeHTML();
   $("tabs").style.display=WELCOMED?"":"none";$("tabs").setAttribute("aria-label",SET.lang==="hi"?"Hisse":"Sections");
   [...v.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,8)));
-  if(WELCOMED&&(tab==="stage"||tab==="wx")){fillWx();ensureWx()}
+  if((WELCOMED&&(tab==="stage"||tab==="wx"))||(!WELCOMED&&wstep===1)){fillWx();ensureWx()}
   const on=document.querySelector(".chip.on"),sp=$("strip");
   if(on&&sp)sp.scrollLeft=on.offsetLeft-sp.clientWidth/2+on.clientWidth/2;
   endSplash();
@@ -546,6 +579,7 @@ document.addEventListener("click",e=>{
   else if(d.a==="logout"){AUTH=null;store("apple-auth",null);SYNC=""}
   else if(d.a==="install"){if(INST){INST.prompt();INST.userChoice.then(()=>{INST=null;ANIM=false;render()})}return}
   else if(d.a==="hideinst"){hideInst=true;try{localStorage.setItem("apple-inst","1")}catch(x){}}
+  else if(d.a==="place"&&PL[d.v]){setPlace({name:d.v,lat:PL[d.v][0],lon:PL[d.v][1]});ANIM=false}
   else if(d.a==="wnext"){wstep=Math.min(3,wstep+1);ANIM=true}
   else if(d.a==="wback"){wstep=Math.max(0,wstep-1);ANIM=true}
   else if(d.a==="wdone"){WELCOMED=true;try{localStorage.setItem("apple-welcome","1")}catch(x){}tab="stage";sub="";ANIM=true;window.scrollTo(0,0)}
