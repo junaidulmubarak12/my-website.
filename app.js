@@ -80,7 +80,7 @@ new MutationObserver(ms=>{
     else m.addedNodes.forEach(trTree);
   }
 }).observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATTRS});
-function applySet(){const r=document.documentElement;r.style.setProperty("--fs",SET.size);SET.theme==="auto"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",SET.theme);document.body.classList.toggle("hinglish",SET.lang==="hi");r.lang=SET.lang==="hi"?"hi-Latn":"en";applyLang();r.classList.toggle("calm",!!SET.calm)}
+function applySet(){const r=document.documentElement;r.style.setProperty("--fs",SET.size);SET.theme==="auto"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",SET.theme);document.body.classList.toggle("hinglish",SET.lang==="hi");r.lang=SET.lang==="hi"?"hi-Latn":"en";applyLang();r.classList.toggle("calm",!!SET.calm);if(typeof paintTheme==="function"){paintTheme();paintChrome()}}
 applySet();
 const OSRM=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const rm=()=>OSRM||SET.calm;
@@ -124,11 +124,11 @@ function ringHTML(){
 function sprView(){
   const s=ST[cur-1],p=cur>1?cur-1:15,n=cur<15?cur+1:1;
   return `<div class="pn"><button data-s="${p}">Previous</button><b>Stage ${s.n} of 15</b><button data-s="${n}">Next</button></div>
-  <div class="hero"><img src="${IMG[s.n]}" alt="${esc(s.t)}" width="480" height="258" decoding="async"><div class="tx"><h2>${esc(s.t)}</h2><p class="lead">${esc(KEY[cur-1])}</p></div></div>
+  <div id="cp1"><div class="hero"><img src="${IMG[s.n]}" alt="${esc(s.t)}" width="480" height="258" decoding="async"><div class="tx"><h2>${esc(s.t)}</h2><p class="lead">${esc(KEY[cur-1])}</p></div></div>
   ${s.x?`<div class="call"><b>Check before spraying.</b> ${esc(s.x)}</div>`:""}
   ${sec("Fungicide",s.fn,s.f)}${sec("Insecticide and oil",s.ni,s.i)}${sec("Mites",s.nm,s.m)}
   ${s.c?`<div class="sec"><h3>In the orchard</h3><p>${esc(s.c)}</p></div>`:""}
-  ${s.f||s.i||s.m?`<p class="m">All doses are per 100 litres of water. Use one product from a list, and never repeat the same pesticide in two sprays in a row.</p>`:`<p class="m">The guide lists no fungicide or insecticide for this stage.</p>`}`;
+  ${s.f||s.i||s.m?`<p class="m">All doses are per 100 litres of water. Use one product from a list, and never repeat the same pesticide in two sprays in a row.</p>`:`<p class="m">The guide lists no fungicide or insecticide for this stage.</p>`}</div><div class="wh noprint" style="margin-top:14px"><button class="pill alt" data-x="copy" data-for="cp1">Copy this stage’s sprays</button><button class="pill alt" data-x="print">Print</button></div>`;
 }
 
 
@@ -151,7 +151,7 @@ function wxView(){
   <label for="wg">Days since your last fungicide spray</label><input id="wg" type="number" min="0" value="7">
   <label for="wl">Product you sprayed last (optional)</label><input id="wl" value="${esc(D.length?D[0].p:"")}" placeholder="For example, Mancozeb 75WP">
   <label for="wt">Your spray tank size in litres</label><input id="wt" type="number" min="1" value="${TANK}"></div>
-  <div id="wo"></div>`;
+  <div id="wo"></div><div class="wh noprint" style="margin-top:12px"><button class="pill alt" data-x="copy" data-for="wo">Copy advice</button><button class="pill alt" data-x="print">Print</button></div>`;
 }
 
 function advise(s,rain,hot,wet,gap){
@@ -311,6 +311,7 @@ const fmt=d=>d.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"num
 function phi(p){const q=p.toLowerCase();let d=0,hit=0;for(const k in PHI)if(q.includes(k)){hit++;d=Math.max(d,PHI[k])}return hit?d:null}
 
 function diaView(){
+  const fl=FLASH;FLASH=null;
   const t=new Date(),iso=new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
   const rows=D.map((e,i)=>{
     let w=`<span class="m">Waiting period is not in the guide’s table. Check the product label.</span>`;
@@ -324,7 +325,8 @@ function diaView(){
   <label for="db">Orchard or block (optional)</label><input id="db">
   <label for="dn">Note (optional)</label><input id="dn">
   <button class="btn" style="margin-top:16px" data-a="add">Save spray</button>
-  <div class="sec"><h3>Saved sprays</h3>${rows||`<p class="m">Nothing saved yet. Your sprays will appear here.</p>`}</div>`;
+  <div id="dmsg" class="msg${fl?" "+fl.k:""}" role="${fl&&fl.k==="err"?"alert":"status"}" aria-live="polite">${fl?esc(fl.t):""}</div>
+  <div class="sec"><h3>Saved sprays</h3>${rows||`<p class="m">Nothing saved yet. Your sprays will appear here.</p>`}${D.length?`<div class="wh noprint" style="margin-top:12px"><button class="pill alt" data-x="copydia">Copy diary</button><button class="pill alt" data-x="print">Print</button></div>`:""}</div>`;
 }
 
 const seg=(k,o)=>`<div class="seg">${o.map(x=>`<button class="${SET[k]===x[0]?"on":""}" data-set="${k}" data-v="${x[0]}">${x[1]}</button>`).join("")}</div>`;
@@ -374,7 +376,7 @@ function learnView(){
   <li>Do not move pesticide to another container. Do not use leaking equipment. Ask an expert if unsure.</li></ul></details>
   <details><summary>Waiting period before harvest</summary><p class="m">Do not harvest fruit, cut grass or let poultry or livestock into the orchard until the waiting period after the last spray is complete.</p>
   <table>${Object.keys(PHI).map(k=>`<tr><td>${k[0].toUpperCase()+k.slice(1)}</td><td>${PHI[k]} days</td></tr>`).join("")}</table>
-  <p class="m">Zineb is not in the guide’s table. Check its label.</p></details>`;
+  <p class="m">Zineb is not in the guide’s table. Check its label.</p></details>${faqHTML()}`;
 }
 const navrow=(s,t,d)=>`<button class="navrow" data-g="set" data-sub="${s}"><span><b>${t}</b><span class="m">${d}</span></span><svg class="mi" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>`;
 function aboutView(){
@@ -404,11 +406,14 @@ function setView(){
 }
 
 const FOOT=`<p class="foot">Photos and spray guidance: SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026. This page repeats the guide and may contain copying errors. Check the original and ask a Plant Protection officer before you spray. Use and sale of products depend on CIB &amp; RC registration and label claim.</p>`;
+// Change this date each time you upload a new version of the site (year-month-day).
+const UPDATED="2026-11-07";
+function updatedHTML(){const p=UPDATED.split("-"),M=["January","February","March","April","May","June","July","August","September","October","November","December"];return `<p class="foot" style="margin-top:6px">Site last updated: ${+p[2]} ${M[+p[1]-1]} ${p[0]}.</p>`}
 
 
 
 /* ---------- Works without internet, and can be installed ---------- */
-let INST=null,hideInst=false;try{hideInst=localStorage.getItem("apple-inst")==="1"}catch(e){}
+let INST=null,hideInst=false,hideNote=false;try{hideInst=localStorage.getItem("apple-inst")==="1";hideNote=localStorage.getItem("apple-notice")==="1"}catch(e){}
 const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone;
 const iOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
 addEventListener("beforeinstallprompt",e=>{e.preventDefault();INST=e;ANIM=false;render()});
@@ -419,6 +424,7 @@ function topBanners(){
   let b="";
   if(!navigator.onLine)b+=`<div class="call" style="margin:0 0 12px"><b>You are offline.</b> The live weather needs internet. Everything else works.</div>`;
   if(tab==="stage"&&!standalone()&&!hideInst&&(INST||iOS))b+=`<div class="card"><b>Use the guide without internet</b><p class="m">${INST?"Install it on your phone. It opens like an app and works without signal.":"Tap the Share button, then Add to Home Screen. It then opens like an app and works without signal."}</p><div class="wh">${INST?`<button class="pill" data-a="install">Install</button>`:""}<button class="pill alt" data-a="hideinst">Not now</button></div></div>`;
+  if(tab==="stage"&&!hideNote)b+=`<div class="card" id="notice"><b>Your data stays on your phone</b><p class="m">This guide has no advertisements and no tracking cookies. Your diary and settings are saved only on this phone.</p><div class="wh"><button class="pill" data-x="notice">OK</button><button class="pill alt" data-g="set" data-sub="privacy">Privacy details</button></div></div>`;
   return b;
 }
 /* ---------- Optional account (Firebase email login). The two Firebase values live in config.js. ---------- */
@@ -475,22 +481,22 @@ async function sync(){
   const f=document.activeElement;if(tab==="dia"&&!(f&&/INPUT|SELECT|TEXTAREA/.test(f.tagName)))render();
 }
 async function acct(kind){
-  const m=t=>{const el=$("acm");if(el)el.textContent=t};
+  const m=(x,k)=>{const el=$("acm");if(el){el.className="msg "+(k||"err");el.textContent=x}};
   const mail=$("ac-mail")?$("ac-mail").value.trim():"",pass=$("ac-pass")?$("ac-pass").value:"";
   try{
     if(kind==="login"||kind==="signup"){
       if(!mail||!pass){m("Please enter your email and password.");return}
       if(kind==="signup"&&pass.length<10){m("Choose a password with at least 10 characters. A short sentence works well.");return}
-      m("Please wait…");
+      m("Please wait…","info");
       setAuth(await fb(kind==="login"?"signInWithPassword":"signUp",{email:mail,password:pass,returnSecureToken:true}));
       await sync();render();
     }else if(kind==="forgot"){
       if(!mail){m("Enter your email above first.");return}
-      await fb("sendOobCode",{requestType:"PASSWORD_RESET",email:mail});m("We sent a password reset link to your email.");
+      await fb("sendOobCode",{requestType:"PASSWORD_RESET",email:mail});m("We sent a password reset link to your email.","ok");
     }else if(kind==="saveprof"){
-      PROF={name:S_($("ac-name").value.trim(),60)};store("apple-profile",PROF);await sync();m("Saved.");
+      PROF={name:S_($("ac-name").value.trim(),60)};store("apple-profile",PROF);await sync();m("Saved.","ok");
     }else if(kind==="delacc"){
-      if(!confirm(t("Delete your account and your online diary? This cannot be undone.")))return;
+      if(!await ask(t("Delete your account and your online diary? This cannot be undone."),"Delete account"))return;
       await fetch(await nodeUrl(),{method:"DELETE"});await fb("delete",{idToken:await token()});
       AUTH=null;store("apple-auth",null);SYNC="";render();
     }
@@ -502,11 +508,11 @@ function accHTML(){
   <label for="ac-name">Your name</label><input id="ac-name" value="${esc(PROF.name)}" autocomplete="name">
   <div class="wh"><button class="pill" data-a="saveprof">Save name</button><button class="pill alt" data-a="syncnow">Save diary online now</button><button class="pill alt" data-a="logout">Log out</button></div>
   <p class="m">Your spray diary is saved online, so you keep it if you change phones. Logging out keeps a copy on this phone. Use Clear spray diary below to remove it.</p>
-  <div class="wh"><button class="pill alt" data-a="delacc">Delete my account and online data</button></div><div id="acm" class="m" role="status"></div></div>`;
+  <div class="wh"><button class="pill alt" data-a="delacc">Delete my account and online data</button></div><div id="acm" class="msg" role="status" aria-live="polite"></div></div>`;
   return `<div class="set"><div><b>Account</b><span class="m">Optional. An account keeps your spray diary safe online so you can use it on another phone. We store only your email, your name and your spray diary.</span></div>
   <label for="ac-mail">Email</label><input id="ac-mail" type="email" autocomplete="email">
-  <label for="ac-pass">Password (at least 10 characters)</label><input id="ac-pass" type="password" autocomplete="current-password">
-  <div class="wh"><button class="pill" data-a="login">Log in</button><button class="pill alt" data-a="signup">Create account</button><button class="pill alt" data-a="forgot">Forgot password</button></div><div id="acm" class="m" role="status"></div></div>`;
+  <label for="ac-pass">Password (at least 10 characters)</label><div class="pwrap"><input id="ac-pass" type="password" autocomplete="current-password"><button type="button" class="pwbtn" data-x="pw" aria-label="Show password" aria-pressed="false">Show</button></div>
+  <div class="wh"><button class="pill" data-a="login">Log in</button><button class="pill alt" data-a="signup">Create account</button><button class="pill alt" data-a="forgot">Forgot password</button></div><div id="acm" class="msg" role="status" aria-live="polite"></div></div>`;
 }
 
 /* ---------- Welcome: a full-screen, photo-led introduction ---------- */
@@ -553,13 +559,14 @@ function welcomeHTML(){
 function render(){
   $("tabs").innerHTML=TABS.map(t=>`<button class="${t[0]===tab?"on":""}" data-tab="${t[0]}"><svg viewBox="0 0 24 24" aria-hidden="true">${IC[t[0]]}</svg>${t[1]}</button>`).join("");
   const v=$("v");v.className=ANIM&&WELCOMED?"anim":"";document.body.classList.toggle("welcoming",!WELCOMED);ensureBg();
-  v.innerHTML=WELCOMED?topBanners()+({stage:homeView,spr:sprView,wx:wxView,dia:diaView,set:setView}[tab])()+FOOT:welcomeHTML();
+  v.innerHTML=WELCOMED?topBanners()+({stage:homeView,spr:sprView,wx:wxView,dia:diaView,set:setView}[tab])()+FOOT+updatedHTML():welcomeHTML();
   $("tabs").style.display=WELCOMED?"":"none";$("tabs").setAttribute("aria-label",SET.lang==="hi"?"Hisse":"Sections");
   [...v.children].forEach((c,i)=>c.style.setProperty("--i",Math.min(i,8)));
   if((WELCOMED&&(tab==="stage"||tab==="wx"))||(!WELCOMED&&wstep===1)){fillWx();ensureWx()}
   const on=document.querySelector(".chip.on"),sp=$("strip");
   if(on&&sp)sp.scrollLeft=on.offsetLeft-sp.clientWidth/2+on.clientWidth/2;
   endSplash();
+  $("top").hidden=!WELCOMED;if(typeof onScroll==="function")onScroll();
 }
 
 document.addEventListener("click",e=>{
@@ -572,8 +579,8 @@ document.addEventListener("click",e=>{
   else if(d.s){setCur(+d.s);if(tab==="spr"){ANIM=true;window.scrollTo(0,0)}}
   else if(d.set){const k=d.set,v=d.v;SET[k]=k==="size"?+v:k==="calm"?v==="1":v;saveSet();applySet()}
   else if(d.a==="forgetplace"){PLACE=null;WX=null;try{localStorage.removeItem("apple-place")}catch(x){}}
-  else if(d.a==="cleardiary"){if(!confirm(t("Delete all your saved sprays?")))return;D.forEach(g=>g.id&&TOMB.push(g.id));store("apple-tomb",TOMB);D=[];saveD();if(AUTH)sync()}
-  else if(d.a==="resetset"){if(!confirm(t("Reset all settings?")))return;SET={...DEF};TANK=SET.tank;saveSet();applySet()}
+  else if(d.a==="cleardiary"){ask(tr("Delete all your saved sprays?"),"Delete all").then(ok=>{if(!ok)return;D.forEach(g=>g.id&&TOMB.push(g.id));store("apple-tomb",TOMB);D=[];saveD();if(AUTH)sync();ANIM=false;render()});return}
+  else if(d.a==="resetset"){ask(tr("Reset all settings?"),"Reset").then(ok=>{if(!ok)return;SET={...DEF};TANK=SET.tank;saveSet();applySet();ANIM=false;render()});return}
   else if(["login","signup","forgot","saveprof","delacc"].includes(d.a)){acct(d.a);return}
   else if(d.a==="syncnow"){sync();return}
   else if(d.a==="logout"){AUTH=null;store("apple-auth",null);SYNC=""}
@@ -587,15 +594,121 @@ document.addEventListener("click",e=>{
   else if(d.a==="gps"){gps();return}
   else if(d.a==="add"){
     const p=$("dp").value.trim();
-    if(!p||!$("dd").value){alert(t("Please enter the date and the product."));return}
-    D.unshift({id:newId(),date:$("dd").value,block:$("db").value.trim(),st:$("ds").value,p,dose:$("dq").value.trim(),note:$("dn").value.trim(),d:phi(p)});saveD();if(AUTH)sync();
+    if(!p||!$("dd").value){formMsg("err",tr("Please enter the date and the product."),[!$("dd").value&&"dd",!p&&"dp"].filter(Boolean));return}
+    D.unshift({id:newId(),date:$("dd").value,block:$("db").value.trim(),st:$("ds").value,p,dose:$("dq").value.trim(),note:$("dn").value.trim(),d:phi(p)});saveD();if(AUTH)sync();FLASH={k:"ok",t:tr("Saved. The spray is in your diary below.")};
   }else if(d.a==="del"){
-    if(!confirm(t("Delete this entry?")))return;
-    const g=D.splice(+d.i,1)[0];if(g&&g.id){TOMB.push(g.id);store("apple-tomb",TOMB)}saveD();if(AUTH)sync();
+    const di=+d.i;ask(tr("Delete this entry?"),"Delete").then(ok=>{if(!ok)return;const g=D.splice(di,1)[0];if(g&&g.id){TOMB.push(g.id);store("apple-tomb",TOMB)}saveD();if(AUTH)sync();ANIM=false;render()});return
   }
   render();
 });
 document.addEventListener("input",e=>{if(e.target.id==="ws")setCur(+e.target.value);if(e.target.id==="wt"||e.target.id==="st-tank"){SET.tank=+e.target.value||100;saveSet();TANK=SET.tank}if(e.target.id==="st-heat"){SET.heat=+e.target.value||30;saveSet()}if(tab==="wx"&&$("wo"))calcW()});
 document.addEventListener("change",e=>{if(e.target.id==="wp"&&PL[e.target.value]){ANIM=false;setPlace({name:e.target.value,lat:PL[e.target.value][0],lon:PL[e.target.value][1]});render()}});
+
+/* ---------- Extras: header, dark-mode button, search, confirmations, copy, print, FAQ ---------- */
+var FLASH=null,tick=false;
+const FAQS=[
+["Where does the spray advice come from?","From the SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026. This guide repeats it and may contain copying errors, so check the product label and ask a Plant Protection officer before you spray."],
+["Does it work without internet?","Yes. After you open it once with internet, the stages, sprays and diary work without signal. Only the live weather needs internet. The last forecast is kept for up to 12 hours and marked as old."],
+["Where is my diary saved?","On this phone. It does not move to another phone or web address by itself. Clearing your browser data deletes it, so use “Copy diary” on the Diary page if you want a backup."],
+["How do I install it on my phone?","Android: open the Chrome menu, then Install app. iPhone: tap Share, then Add to Home Screen. It then opens like an app."],
+["Why is the hot weather limit 30°C?","The guide says not to spray in high heat but gives no number. 30°C is a starting value chosen for this guide, not from SKUAST-K. Ask your expert and change it in Settings."],
+["Is it free? Are there advertisements?","It is free. It sells nothing and has no advertisements."]];
+function faqHTML(){return `<div class="sec" id="faq"><h3>Common questions</h3>${FAQS.map(f=>`<details><summary>${esc(f[0])}</summary><p>${esc(f[1])}</p></details>`).join("")}</div>`}
+function isDark(){return SET.theme==="dark"||(SET.theme==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches)}
+function paintTheme(){
+  const b=$("thm");if(!b)return;
+  const sun='<path d="M12 4V2M12 22v-2M4 12H2M22 12h-2M5.6 5.6 4.2 4.2M19.8 19.8l-1.4-1.4M5.6 18.4l-1.4 1.4M19.8 4.2l-1.4 1.4"/><circle cx="12" cy="12" r="4"/>',moon='<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>';
+  b.innerHTML=`<svg viewBox="0 0 24 24" class="mi2" aria-hidden="true">${isDark()?sun:moon}</svg>`;
+  b.setAttribute("aria-label",isDark()?"Switch to light mode":"Switch to dark mode");
+}
+function paintChrome(){
+  const lab=(id,en)=>{const e=$(id);if(e)e.setAttribute("aria-label",tr(en))};
+  lab("srch","Search the guide");lab("totop","Back to top");
+  const s=$("skip");if(s)s.textContent=tr("Skip to content");
+  const f=$("fbt");if(f)f.textContent=tr("Send feedback");
+}
+paintChrome();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",paintTheme);
+function onScroll(){if(tick)return;tick=true;requestAnimationFrame(()=>{tick=false;const h=document.documentElement.scrollHeight-innerHeight,y=window.scrollY,p=$("prog"),b=$("totop");if(p)p.style.transform="scaleX("+(h>0?Math.min(1,Math.max(0,y/h)):0)+")";if(b)b.hidden=y<500})}
+addEventListener("scroll",onScroll,{passive:true});addEventListener("resize",onScroll);
+if(REV.feedback){const f=$("fbl");f.href=REV.feedback;f.hidden=false}
+const say=m=>{const l=$("live");if(l){l.textContent="";setTimeout(()=>{l.textContent=tr(m)},50)}};
+function formMsg(k,text,ids){
+  const el=$("dmsg");if(!el)return;el.className="msg "+k;el.setAttribute("role",k==="err"?"alert":"status");el.textContent=text;
+  (ids||[]).forEach(i=>{const f=$(i);if(f)f.setAttribute("aria-invalid","true")});
+  const f=ids&&ids[0]&&$(ids[0]);if(f)f.focus();
+}
+function ask(msg,okText){
+  return new Promise(res=>{
+    if(typeof HTMLDialogElement==="undefined"){res(confirm(msg));return}
+    const d=document.createElement("dialog");d.className="dlg";d.setAttribute("aria-labelledby","dlgt");
+    d.innerHTML=`<h3 id="dlgt">Are you sure?</h3><p>${esc(msg)}</p><div class="wh"><button type="button" class="pill alt" data-r="0">Cancel</button><button type="button" class="pill danger" data-r="1">${esc(okText||"Delete")}</button></div>`;
+    d.addEventListener("click",e=>{if(e.target===d){d.close("0");return}const b=e.target.closest("button");if(b)d.close(b.dataset.r)});
+    d.addEventListener("close",()=>{const ok=d.returnValue==="1";d.remove();res(ok)});
+    document.body.appendChild(d);d.showModal();d.querySelector('[data-r="0"]').focus();
+  });
+}
+function sIndex(){
+  const out=[],T=x=>x+" "+tr(x);
+  ST.forEach((s,i)=>{
+    out.push({n:s.n,tab:"spr",lab:s.t,a:"Stage "+s.n,hay:(s.t+" "+(KEY[i]||"")+" "+(s.c||"")).toLowerCase()});
+    [["f","Fungicide"],["i","Insecticide and oil"],["m","Mites"]].forEach(([f,l])=>{if(s[f])s[f].split("|").forEach(x=>{x=x.trim();if(x)out.push({n:s.n,tab:"spr",lab:x,b:l,a:"Stage "+s.n,hay:x.toLowerCase()})})});
+  });
+  ["Scab","Apple leaf blotch miner","Before you spray","Waiting period before harvest"].forEach(h=>out.push({tab:"set",sub:"learn",lab:tr(h),a:"Learn",hay:T(h).toLowerCase()}));
+  FAQS.forEach((f,i)=>out.push({tab:"set",sub:"learn",faq:i,lab:tr(f[0]),a:"Common questions",hay:(T(f[0])+" "+T(f[1])).toLowerCase()}));
+  return out;
+}
+function openSearch(){
+  const d=document.createElement("dialog");d.className="dlg srch";d.setAttribute("aria-label","Search the guide");
+  d.innerHTML=`<div class="srow"><input id="sq" type="search" autocomplete="off" placeholder="Search stages, products and questions" aria-label="Search stages, products and questions"><button type="button" class="pill alt" data-r="x">Close</button></div><div id="sres" aria-live="polite"></div>`;
+  document.body.appendChild(d);
+  const res=d.querySelector("#sres"),inp=d.querySelector("#sq");let R=[];
+  const run=()=>{
+    const q=inp.value.trim().toLowerCase();
+    if(q.length<2){R=[];res.innerHTML='<p class="m">Type at least 2 letters.</p>';return}
+    const w=q.split(/\s+/);R=sIndex().filter(r=>w.every(x=>r.hay.includes(x))).slice(0,30);
+    res.innerHTML=R.length?`<ul class="sl">${R.map((r,i)=>`<li><button type="button" data-i="${i}">${esc(r.lab)}<small>${r.b?`<span>${esc(r.b)}</span> · `:""}<span>${esc(r.a)}</span></small></button></li>`).join("")}</ul>`:'<p class="m">No match. Try a product name or a stage name.</p>';
+  };
+  const go=r=>{
+    d.close();tab=r.tab;sub=r.sub||"";if(r.n)setCur(r.n);ANIM=true;render();window.scrollTo(0,0);
+    if(r.faq!==undefined){const x=document.querySelectorAll("#faq details")[r.faq];if(x){x.open=true;x.scrollIntoView({block:"center"});const s=x.querySelector("summary");if(s)s.focus()}}
+  };
+  inp.addEventListener("input",run);
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"&&R[0]){e.preventDefault();go(R[0])}});
+  d.addEventListener("click",e=>{if(e.target===d){d.close();return}const b=e.target.closest("button");if(!b)return;if(b.dataset.r){d.close();return}if(R[+b.dataset.i])go(R[+b.dataset.i])});
+  d.addEventListener("close",()=>d.remove());
+  d.showModal();inp.focus();run();
+}
+async function copyText(x){
+  try{await navigator.clipboard.writeText(x);return true}catch(e){}
+  try{const a=document.createElement("textarea");a.value=x;a.setAttribute("readonly","");a.style.cssText="position:fixed;top:0;left:0;opacity:0";document.body.appendChild(a);a.select();const ok=document.execCommand("copy");a.remove();return ok}catch(e){return false}
+}
+async function doCopy(b,x){
+  if(!x||!x.trim()){say("Nothing to copy yet.");return}
+  const old=b.textContent,ok=await copyText(x.trim());
+  b.textContent=tr(ok?"Copied":"Could not copy");say(ok?"Copied":"Could not copy");
+  setTimeout(()=>{b.textContent=old},2200);
+}
+function diaText(){
+  return D.map(e=>{let l=fmt(new Date(e.date+"T00:00:00"))+" - "+e.p+(e.dose?" ("+e.dose+")":"")+" - "+tr("Stage")+" "+e.st+(e.block?" - "+e.block:"")+(e.note?" - "+e.note:"");
+    if(e.d!==null){const h=new Date(e.date+"T00:00:00");h.setDate(h.getDate()+e.d);l+=" - "+tr("Do not harvest before")+" "+fmt(h)}return l}).join("\n");
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-x]");if(!b)return;
+  const x=b.dataset.x;
+  if(x==="skip"){e.preventDefault();const v=$("v");v.focus();v.scrollIntoView();return}
+  if(x==="theme"){SET.theme=isDark()?"light":"dark";saveSet();applySet();if(tab==="set"&&WELCOMED){ANIM=false;render()}return}
+  if(x==="search"){openSearch();return}
+  if(x==="top"){window.scrollTo({top:0,behavior:OSRM||SET.calm?"auto":"smooth"});return}
+  if(x==="print"){window.print();return}
+  if(x==="copy"){const el=$(b.dataset.for);doCopy(b,el?el.innerText:"");return}
+  if(x==="copydia"){doCopy(b,diaText());return}
+  if(x==="notice"){hideNote=true;try{localStorage.setItem("apple-notice","1")}catch(z){}ANIM=false;render();return}
+  if(x==="pw"){const i=$("ac-pass");if(!i)return;const show=i.type==="password";i.type=show?"text":"password";b.textContent=show?"Hide":"Show";b.setAttribute("aria-pressed",show?"true":"false");b.setAttribute("aria-label",show?"Hide password":"Show password")}
+});
+document.addEventListener("input",e=>{if(e.target.getAttribute&&e.target.getAttribute("aria-invalid"))e.target.removeAttribute("aria-invalid")});
+addEventListener("beforeprint",()=>document.querySelectorAll("#v details").forEach(d=>{d.dataset.was=d.open?"1":"0";d.open=true}));
+addEventListener("afterprint",()=>document.querySelectorAll("#v details").forEach(d=>{d.open=d.dataset.was==="1"}));
+
 render();
 if(AUTH)sync();
