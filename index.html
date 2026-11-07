@@ -17,6 +17,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#17805a">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -165,7 +166,7 @@ body.welcoming::before,body.welcoming #top,body.welcoming .fab{display:none}
 #top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
 #top[hidden]{display:none}
 .tbar{max-width:720px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.brand{display:flex;align-items:center;gap:8px;font-weight:800;min-width:0}.brand svg{width:30px;height:30px;flex:none}.brand b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;font-weight:800;min-width:0}.brand svg{width:30px;height:30px;flex:none}.brand b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .acts{display:flex;gap:8px;flex:none}.acts .round{width:44px;height:44px}.acts .round svg,.fab svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .acts .round svg{width:24px;height:24px}
 #prog{height:3px;background:var(--green);transform:scaleX(0);transform-origin:left;will-change:transform}
@@ -221,7 +222,7 @@ a{color:#000}
 </head>
 <body>
 <a class="skiplink" id="skip" href="#v" data-x="skip">Skip to content</a>
-<header id="top" hidden><div class="tbar"><div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8c-1.5-1.6-6-1.4-6 4.2 0 3.7 2.6 7.8 4.6 7.8.9 0 1.1-.5 1.4-.5s.5.5 1.4.5c2 0 4.6-4.1 4.6-7.8C18 6.6 13.5 6.4 12 8z" fill="#b3262e"/><path d="M12 8c0-2 1-3.5 3-4" stroke="#3f8f4a" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><b>Kashmir Apple Guide</b></div><div class="acts"><button type="button" class="round" id="srch" data-x="search" aria-label="Search the guide"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button><button type="button" class="round" id="thm" data-x="theme" aria-label="Switch to dark mode"></button></div></div><div id="prog" aria-hidden="true"></div></header>
+<header id="top" hidden><div class="tbar"><button type="button" class="brand" data-tab="stage"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8c-1.5-1.6-6-1.4-6 4.2 0 3.7 2.6 7.8 4.6 7.8.9 0 1.1-.5 1.4-.5s.5.5 1.4.5c2 0 4.6-4.1 4.6-7.8C18 6.6 13.5 6.4 12 8z" fill="#b3262e"/><path d="M12 8c0-2 1-3.5 3-4" stroke="#3f8f4a" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><b>Kashmir Apple Guide</b></button><div class="acts"><button type="button" class="round" id="srch" data-x="search" aria-label="Search the guide"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button><button type="button" class="round" id="thm" data-x="theme" aria-label="Switch to dark mode"></button></div></div><div id="prog" aria-hidden="true"></div></header>
 <div id="splash" role="status" aria-label="Loading"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8c-1.5-1.6-6-1.4-6 4.2 0 3.7 2.6 7.8 4.6 7.8.9 0 1.1-.5 1.4-.5s.5.5 1.4.5c2 0 4.6-4.1 4.6-7.8C18 6.6 13.5 6.4 12 8z" fill="#b3262e"/><path d="M12 8c0-2 1-3.5 3-4" stroke="#3f8f4a" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><b>Kashmir Apple Guide</b><span>Loading…</span></div>
 <noscript><style>#splash{display:none}</style><div class="card" style="margin:16px">This guide needs JavaScript. Please turn it on in your browser.</div></noscript>
 <div id="wbg" aria-hidden="true"></div>

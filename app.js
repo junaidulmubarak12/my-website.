@@ -385,7 +385,7 @@ function aboutView(){
   <div class="sec"><h3>What it is</h3><p>A free guide for apple growers in Kashmir. It shows what the SKUAST-K spray schedule says for each growth stage, checks it against the weather where you are, and keeps a record of your sprays. It sells nothing and has no advertisements.</p></div>
   <div class="sec"><h3>Where the information comes from</h3><p>The stages, products, doses and waiting periods are copied from the SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026 (Directorate of Research). The stage photos come from the same guide and are used with SKUAST-K’s permission. The spray information was copied in October 2026.</p>${rev}</div>
   <div class="sec"><h3>Please remember</h3><ul><li>This guide repeats the official schedule. It cannot see your trees.</li><li>Read the product label and check the waiting period before every spray.</li><li>Products must be registered in India (CIB &amp; RC). Ask a Plant Protection officer if you are unsure.</li></ul></div>
-  <div class="sec"><h3>Contact and feedback</h3>${REV.contact?`<p>${esc(REV.contact)}</p>`:""}${REV.feedback?`<p><a class="lnk" href="${esc(REV.feedback)}" target="_blank" rel="noopener noreferrer">Send feedback or report a mistake</a></p>`:`<p class="m">The feedback link has not been added yet.</p>`}</div>
+  ${REV.contact||REV.feedback?`<div class="sec"><h3>Contact and feedback</h3>${REV.contact?`<p>${linkify(REV.contact)}</p>`:""}${REV.feedback?`<p><a class="lnk" href="${esc(REV.feedback)}" target="_blank" rel="noopener noreferrer">Send feedback or report a mistake</a></p>`:""}</div>`:""}
   <div class="sec"><h3>Version</h3><p>Version 2${REV.owner?". Made by "+esc(REV.owner)+".":"."}</p></div>`;
 }
 function privacyView(){
@@ -395,7 +395,7 @@ function privacyView(){
   <div class="sec"><h3>Fonts</h3><p>The page loads its text font from Google Fonts, so Google can see your internet address when the font is first downloaded.</p></div>
   <div class="sec"><h3>Accounts</h3><p>${ON?"If you create an account, your email address, your name and your spray diary are stored with Google Firebase. Your password is handled by Firebase and is never seen by this guide. You can delete the account and the online data in Settings. Logging out keeps a copy of your diary on this phone.":"Accounts are not switched on yet. When they are, this page will explain what is stored."}</p></div>
   <div class="sec"><h3>What this guide does not do</h3><p>It has no advertisements, no tracking and no analytics, and it does not sell or share your information.</p></div>
-  <div class="sec"><h3>Questions</h3><p>${REV.contact?esc(REV.contact):"Use the feedback link on the About page."}</p></div>`;
+  ${REV.contact||REV.feedback?`<div class="sec"><h3>Questions</h3><p>${REV.contact?linkify(REV.contact):"Use the feedback link on the About page."}</p></div>`:""}`;
 }
 function setView(){
   if(sub==="learn")return learnView();
@@ -408,6 +408,14 @@ function setView(){
 const FOOT=`<p class="foot">Photos and spray guidance: SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026. This page repeats the guide and may contain copying errors. Check the original and ask a Plant Protection officer before you spray. Use and sale of products depend on CIB &amp; RC registration and label claim.</p>`;
 // Change this date each time you upload a new version of the site (year-month-day).
 const UPDATED="2026-11-07";
+function linkify(s){
+  return String(s).split(/([A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+|\+?\d[\d ()-]{7,16}\d)/).map((p,i)=>{
+    if(i%2===0)return esc(p);
+    if(p.includes("@"))return `<a class="lnk" href="mailto:${esc(p)}">${esc(p)}</a>`;
+    const d=p.replace(/[^\d+]/g,"");
+    return d.replace(/\D/g,"").length>=8?`<a class="lnk" href="tel:${d}">${esc(p)}</a>`:esc(p);
+  }).join("");
+}
 function updatedHTML(){const p=UPDATED.split("-"),M=["January","February","March","April","May","June","July","August","September","October","November","December"];return `<p class="foot" style="margin-top:6px">Site last updated: ${+p[2]} ${M[+p[1]-1]} ${p[0]}.</p>`}
 
 
@@ -566,7 +574,7 @@ function render(){
   const on=document.querySelector(".chip.on"),sp=$("strip");
   if(on&&sp)sp.scrollLeft=on.offsetLeft-sp.clientWidth/2+on.clientWidth/2;
   endSplash();
-  $("top").hidden=!WELCOMED;if(typeof onScroll==="function")onScroll();
+  $("top").hidden=!WELCOMED;{const tt=TABS.find(x=>x[0]===tab);document.title=(WELCOMED&&tab!=="stage"&&tt?tr(tt[1])+" | ":"")+"Kashmir Apple Guide"}if(typeof onScroll==="function")onScroll();
 }
 
 document.addEventListener("click",e=>{
