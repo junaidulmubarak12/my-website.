@@ -96,6 +96,55 @@ const wicon=c=>c===0?`<svg viewBox="0 0 48 48" class="wi"><circle cx="24" cy="24
 
 const chipsHTML=()=>`<div class="chips" id="strip">${ST.map(x=>`<button class="chip${x.n===cur?" on":""}" data-s="${x.n}"><img src="${TH[x.n]}" alt="" width="30" height="30" loading="lazy" decoding="async">${esc(x.t)}</button>`).join("")}</div>`;
 const rainSentence=x=>x.n24>=1?`Rain expected in the next 24 hours (${x.n24.toFixed(1)} mm).`:x.rain==="week"?"No rain in the next 24 hours, but rain later this week.":"Dry for the next 7 days.";
+function alertsHTML(w){
+  if(!w)return "";
+  const d=w.daily,L=["Today","Tomorrow","In 2 days"],A=[],r=v=>Math.round(v)+0;
+  for(let i=0;i<3;i++){
+    const lo=d.temperature_2m_min&&d.temperature_2m_min[i],c=d.weather_code&&d.weather_code[i];
+    if(typeof lo==="number"){
+      if(lo<=0)A.push({k:"stop",t:"frost",i,s:`Frost expected. Low of ${r(lo)}°C.`});
+      else if(lo<=2)A.push({k:"wait",t:"frost",i,s:`Frost possible near the ground. Low of ${r(lo)}°C.`});
+    }
+    if(c===96||c===99)A.push({k:"stop",t:"hail",i,s:"Thunderstorm with hail possible."});
+    else if(c===95)A.push({k:"wait",t:"hail",i,s:"Thunderstorm expected. Hail can happen in thunderstorms."});
+  }
+  if(!A.length)return "";
+  const adv={frost:"Check your orchard early in the morning. Flowers and young fruit are the most at risk. Ask your horticulture officer how to protect them.",hail:"After the storm, check fruit and leaves for damage. Hail wounds can let disease in, so ask your horticulture officer whether a spray is needed."};
+  return `<section class="card alerts" aria-label="Weather warnings"><h3>Weather warnings</h3>${WX&&WX.old?`<p class="m">This is an old forecast. Check again when you have internet.</p>`:""}${A.map(a=>`<div class="al ${a.k}"><b>${L[a.i]}</b><span>${a.s}</span></div>`).join("")}${[...new Set(A.map(a=>a.t))].map(k=>`<p class="m">${adv[k]}</p>`).join("")}</section>`;
+}
+function sprayCat(p){
+  const q=String(p).toLowerCase();
+  for(const c of ["f","i","m"])for(const s of ST)if(s[c])for(const row of s[c].split("|")){
+    const n=row.replace(/\s*\(.*$/,"").trim().toLowerCase().split(/\s+/)[0];
+    if(n.length>=4&&q.includes(n))return c==="f"?"f":"i";
+  }
+  return null;
+}
+function nextHTML(){
+  const s=ST[cur-1],t0=new Date();t0.setHours(0,0,0,0);
+  const E=D.map(e=>({e,dt:new Date(e.date+"T00:00:00"),c:sprayCat(e.p)})).filter(x=>!isNaN(x.dt)&&x.dt<=t0);
+  const pick=c=>E.reduce((a,x)=>(c?x.c===c:true)&&(!a||x.dt>a.dt)?x:a,null);
+  const btn='<div class="acts2"><button class="btn alt" data-g="dia">Open diary</button></div>';
+  const last=pick(null);
+  if(!last)return `<div class="card" id="nextcard"><h3>Next spray</h3><p class="m">No sprays saved yet. Save each spray in the Diary and this card will count the days for you.</p>${btn}</div>`;
+  const add=(dt,n)=>new Date(dt.getTime()+n*864e5),ago=Math.round((t0-last.dt)/864e5),when=ago===0?"today":ago===1?"yesterday":ago+" days ago";
+  const lf=pick("f"),li=pick("i");
+  const row=(lab,nb,why,note)=>`<div class="nx"><span>${lab}</span>${nb?`<b>Not before ${fmt(nb)}</b><small>${why}</small>`:note?`<b>Check the Diary</b><small>${note}</small>`:`<b>No waiting rule today</b>`}</div>`;
+  let rows="";
+  if(s.f){
+    let nb=null,why="",note="";
+    if(cur===5){if(!lf)note="Save your last fungicide in the Diary to count the 10 days.";else{const d=add(lf.dt,10);if(d>t0){nb=d;why="10 days after your last fungicide, as the guide says for flowering."}}}
+    if(li){const d=add(li.dt,4);if(d>t0&&(!nb||d>nb)){nb=d;why="3 to 4 days after your last insecticide or oil spray."}}
+    rows+=row("Fungicide",nb,why,nb?"":note);
+  }
+  if(s.i||s.m){
+    let nb=null,why="";
+    if(lf){const d=add(lf.dt,4);if(d>t0){nb=d;why="3 to 4 days after your last fungicide spray."}}
+    rows+=row("Insecticide, oil or mite spray",nb,why,"");
+  }
+  if(!rows)rows=`<p class="m">The guide lists no fungicide or insecticide for this stage.</p>`;
+  return `<div class="card" id="nextcard"><h3>Next spray</h3><p>Last spray: ${esc(last.e.p)}, ${when}.</p>${rows}<p class="m">Do not repeat ${esc(last.e.p)} in your next spray.</p>${btn}</div>`;
+}
 function lastGap(){if(!D.length)return 7;const d=Math.floor((Date.now()-new Date(D[0].date+"T00:00:00"))/864e5);return d>=0&&d<365?d:7}
 function todayHTML(w){
   const s=ST[cur-1],foot=`<p class="m" style="margin:12px 0 0">Source: SKUAST-K Guide 2026. ${REV.name?"Reviewed by "+esc(REV.name):"Not yet reviewed by an expert"}.</p>`;
@@ -110,7 +159,9 @@ function todayHTML(w){
 function homeView(){
   const s=ST[cur-1];
   return `<div class="gr"><div><span class="m">${greet()}${PROF.name?", "+esc(PROF.name):""}</span><h1>Assalamu alaikum</h1></div><button class="round" data-g="set" data-sub="learn" aria-label="Learn: safety notes and waiting periods">${LOGO}</button></div>
+  <div id="alerts"></div>
   <div id="today"></div>
+  ${nextHTML()}
   ${chipsHTML()}
   <div class="card stage"><img src="${IMG[s.n]}" alt="${esc(s.t)}" width="480" height="258" decoding="async"><div class="tx"><span class="m">Stage ${s.n} of 15</span><h2>${esc(s.t)}</h2><p class="lead">${esc(KEY[cur-1])}</p><button class="btn" data-g="spr">See sprays and doses</button></div></div>
   <div class="card" id="wcard"></div><div class="tiles" id="htiles"></div>
@@ -211,11 +262,11 @@ function calcW(){
 const DT=/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/;
 function cleanWx(j){
   try{
-    const c=j.current,h=j.hourly,d=j.daily,tt=a=>{if(!Array.isArray(a)||a.length>400||!a.every(x=>typeof x==="string"&&DT.test(x)))throw 0;return a.slice()},nn=(a,k)=>a.slice(0,k).map(x=>N(x));
+    const c=j.current,h=j.hourly,d=j.daily,tt=a=>{if(!Array.isArray(a)||a.length>400||!a.every(x=>typeof x==="string"&&DT.test(x)))throw 0;return a.slice()},nn=(a,k)=>a.slice(0,k).map(x=>N(x)),nz=(a,k)=>Array.isArray(a)?a.slice(0,k).map(x=>typeof x==="number"&&Number.isFinite(x)?x:null):[];
     if(typeof c.time!=="string"||!DT.test(c.time))throw 0;
     return{current:{time:c.time,temperature_2m:N(c.temperature_2m),relative_humidity_2m:N(c.relative_humidity_2m),precipitation:N(c.precipitation),weather_code:N(c.weather_code),wind_speed_10m:N(c.wind_speed_10m)},
       hourly:{time:tt(h.time),precipitation:nn(h.precipitation,400)},
-      daily:{time:tt(d.time).slice(0,7),precipitation_sum:nn(d.precipitation_sum,7),temperature_2m_max:nn(d.temperature_2m_max,7),sunrise:tt(d.sunrise).slice(0,7),sunset:tt(d.sunset).slice(0,7)}};
+      daily:{time:tt(d.time).slice(0,7),precipitation_sum:nn(d.precipitation_sum,7),temperature_2m_max:nn(d.temperature_2m_max,7),temperature_2m_min:nz(d.temperature_2m_min,7),weather_code:nz(d.weather_code,7),sunrise:tt(d.sunrise).slice(0,7),sunset:tt(d.sunset).slice(0,7)}};
   }catch(e){return null}
 }
 function wxIn(w){
@@ -259,6 +310,7 @@ function fillWx(){
   if($("wcard"))$("wcard").innerHTML=wcardHTML(w);
   if($("htiles"))$("htiles").innerHTML=tilesHTML(w);
   if($("hrain"))$("hrain").innerHTML=rainHTML(w);
+  if($("alerts"))$("alerts").innerHTML=alertsHTML(w);
   if($("today"))$("today").innerHTML=todayHTML(w);
   if($("wmini"))$("wmini").innerHTML=miniHTML(w);
   if(w&&$("wr")){const x=wxIn(w);$("wr").value=x.rain;$("wh").value=x.hot?"1":"0";$("ww").value=x.wet?"1":"0"}
@@ -272,7 +324,7 @@ function ensureWx(){
 async function loadWx(){
   const p=PLACE;LOAD=true;ERR=false;fillWx();
   try{
-    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=precipitation&daily=precipitation_sum,temperature_2m_max,sunrise,sunset&forecast_days=7&timezone=auto`,{signal:AbortSignal.timeout?AbortSignal.timeout(10000):undefined});
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=precipitation&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&forecast_days=7&timezone=auto`,{signal:AbortSignal.timeout?AbortSignal.timeout(10000):undefined});
     if(!r.ok)throw new Error("bad response");
     const cj=cleanWx(await r.json());if(!cj)throw new Error("bad data");
     WX={j:cj,k:p.lat+","+p.lon,t:Date.now()};
@@ -407,7 +459,7 @@ function setView(){
 
 const FOOT=`<p class="foot">Photos and spray guidance: SKUAST-K Integrated Management Guide for Apple Orchards in Kashmir, 2026. This page repeats the guide and may contain copying errors. Check the original and ask a Plant Protection officer before you spray. Use and sale of products depend on CIB &amp; RC registration and label claim.</p>`;
 // Change this date each time you upload a new version of the site (year-month-day).
-const UPDATED="2026-11-07";
+const UPDATED="2026-11-09";
 function linkify(s){
   return String(s).split(/([A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+|\+?\d[\d ()-]{7,16}\d)/).map((p,i)=>{
     if(i%2===0)return esc(p);
@@ -620,6 +672,8 @@ const FAQS=[
 ["Where is my diary saved?","On this phone. It does not move to another phone or web address by itself. Clearing your browser data deletes it, so use “Copy diary” on the Diary page if you want a backup."],
 ["How do I install it on my phone?","Android: open the Chrome menu, then Install app. iPhone: tap Share, then Add to Home Screen. It then opens like an app."],
 ["Why is the hot weather limit 30°C?","The guide says not to spray in high heat but gives no number. 30°C is a starting value chosen for this guide, not from SKUAST-K. Ask your expert and change it in Settings."],
+["How are the frost and hail warnings decided?","A frost warning shows when the forecast low is 0°C or below, and a possible-frost note at 2°C or below. These limits were chosen for this guide, not taken from SKUAST-K. The hail warning shows when the forecast has a thunderstorm with hail. Forecasts can be wrong and hail is very local, so look at the sky and ask your horticulture officer."],
+["How does the next spray card work?","It counts the days from the sprays you save in the Diary and shows the waiting rules from the guide: 10 days after a fungicide at flowering, and 3 to 4 days between an insecticide and a fungicide. It does not know about sprays you did not save. Rain still decides whether a fungicide is needed: see the Today card."],
 ["Is it free? Are there advertisements?","It is free. It sells nothing and has no advertisements."]];
 function faqHTML(){return `<div class="sec" id="faq"><h3>Common questions</h3>${FAQS.map(f=>`<details><summary>${esc(f[0])}</summary><p>${esc(f[1])}</p></details>`).join("")}</div>`}
 function isDark(){return SET.theme==="dark"||(SET.theme==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches)}

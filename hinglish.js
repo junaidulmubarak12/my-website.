@@ -1,6 +1,28 @@
 // Hinglish text (Hindi written in English letters). Edit the words here; no other file needs to change.
 // Product names, doses and units are never translated.
 const HI={
+"Weather warnings": "Mausam ki chetavani",
+"Tomorrow": "Kal",
+"In 2 days": "2 din baad",
+"This is an old forecast. Check again when you have internet.": "Yeh purana forecast hai. Internet milne par dobara dekhein.",
+"Check your orchard early in the morning. Flowers and young fruit are the most at risk. Ask your horticulture officer how to protect them.": "Subah jaldi apna bagh dekhein. Phool aur chhote phal sabse zyada khatre mein hote hain. Bagwani officer se poochhein ki unhe kaise bachayein.",
+"After the storm, check fruit and leaves for damage. Hail wounds can let disease in, so ask your horticulture officer whether a spray is needed.": "Toofan ke baad phal aur patton ka nuksaan dekhein. Ole ke zakhm se bimari andar aa sakti hai, isliye bagwani officer se poochhein ki spray chahiye ya nahi.",
+"Thunderstorm with hail possible.": "Ole ke saath toofan ho sakta hai.",
+"Thunderstorm expected. Hail can happen in thunderstorms.": "Toofan ka andesha. Toofan mein ole pad sakte hain.",
+"Next spray": "Agli spray",
+"No sprays saved yet. Save each spray in the Diary and this card will count the days for you.": "Abhi koi spray save nahi hui. Har spray Diary mein save karein, yeh card din ginta rahega.",
+"Open diary": "Diary kholein",
+"Insecticide, oil or mite spray": "Insecticide, oil ya mite spray",
+"No waiting rule today": "Aaj koi intezaar ka niyam nahi",
+"10 days after your last fungicide, as the guide says for flowering.": "Aakhri fungicide ke 10 din baad, jaisa guide phool aane par kehti hai.",
+"3 to 4 days after your last insecticide or oil spray.": "Aakhri insecticide ya oil spray ke 3 se 4 din baad.",
+"3 to 4 days after your last fungicide spray.": "Aakhri fungicide spray ke 3 se 4 din baad.",
+"Check the Diary": "Diary dekhein",
+"Save your last fungicide in the Diary to count the 10 days.": "10 din ginne ke liye apni aakhri fungicide Diary mein save karein.",
+"How are the frost and hail warnings decided?": "Frost aur ole ki chetavani kaise tay hoti hai?",
+"A frost warning shows when the forecast low is 0°C or below, and a possible-frost note at 2°C or below. These limits were chosen for this guide, not taken from SKUAST-K. The hail warning shows when the forecast has a thunderstorm with hail. Forecasts can be wrong and hail is very local, so look at the sky and ask your horticulture officer.": "Frost ki chetavani tab aati hai jab forecast ka sabse kam taapmaan 0°C ya usse neeche ho, aur frost ho sakta hai ka nishan 2°C ya usse neeche par. Yeh had is guide ke liye rakhi gayi hain, SKUAST-K se nahi li gayi. Ole ki chetavani tab aati hai jab forecast mein ole ke saath toofan ho. Forecast galat ho sakte hain aur ole bahut chhote ilake mein padte hain, isliye aasman dekhein aur bagwani officer se poochhein.",
+"How does the next spray card work?": "Agli spray ka card kaise kaam karta hai?",
+"It counts the days from the sprays you save in the Diary and shows the waiting rules from the guide: 10 days after a fungicide at flowering, and 3 to 4 days between an insecticide and a fungicide. It does not know about sprays you did not save. Rain still decides whether a fungicide is needed: see the Today card.": "Yeh Diary mein save ki gayi spray se din ginta hai aur guide ke intezaar ke niyam dikhata hai: phool aane par fungicide ke 10 din baad, aur insecticide aur fungicide ke beech 3 se 4 din. Jo spray save nahi ki, uske baare mein ise nahi pata. Fungicide chahiye ya nahi, yeh ab bhi baarish tay karti hai: Today card dekhein.",
 "Skip to content": "Seedhe content par jaayein",
 "Search the guide": "Guide mein khojein",
 "Switch to dark mode": "Dark mode chalu karein",
@@ -333,6 +355,11 @@ const HI={
 "Loading…": "Load ho raha hai…"
 };
 const HIP=[
+ [/^Frost expected\. Low of (-?\d+)°C\.$/,m=>`Frost ka andesha. Sabse kam taapmaan: ${m[1]}°C.`],
+ [/^Frost possible near the ground\. Low of (-?\d+)°C\.$/,m=>`Zameen ke paas frost ho sakta hai. Sabse kam taapmaan: ${m[1]}°C.`],
+ [/^Last spray: (.+), (today|yesterday|(\d+) days ago)\.$/,m=>`Aakhri spray: ${m[1]}, ${m[2]==="today"?"aaj":m[2]==="yesterday"?"kal":m[3]+" din pehle"}.`],
+ [/^Not before (.+)$/,m=>`${m[1]} se pehle nahi`],
+ [/^Do not repeat (.+) in your next spray\.$/,m=>`Agli spray mein ${m[1]} dobara na karein.`],
  [/^Site last updated: (.+)\.$/,m=>`Site aakhri baar update hua: ${m[1]}.`],
  [/^Stage (\d+) of (\d+)$/,m=>`Stage ${m[1]} / ${m[2]}`],
  [/^Rain expected in the next 24 hours \(([\d.]+) mm\)\.$/,m=>`Agle 24 ghante mein baarish ki ummeed hai (${m[1]} mm).`],
