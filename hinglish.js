@@ -1,6 +1,23 @@
 // Hinglish text (Hindi written in English letters). Edit the words here; no other file needs to change.
 // Product names, doses and units are never translated.
 const HI={
+"How are the frost, hail and snow warnings decided?": "Frost, ole aur barf ki chetavani kaise tay hoti hai?",
+"A frost warning shows when the forecast low is 0°C or below, and a possible-frost note at 2°C or below. A snow warning shows when the forecast has about 1 cm of snow or more, and a possible-snow note for lighter snow. The hail warning shows when the forecast has a thunderstorm with hail. These limits were chosen for this guide, not taken from SKUAST-K. Forecasts can be wrong and hail is very local, so look at the sky and ask your horticulture officer.": "Frost ki chetavani tab aati hai jab forecast ka sabse kam taapmaan 0°C ya usse neeche ho, aur frost ho sakta hai ka nishan 2°C ya usse neeche par. Barf ki chetavani tab aati hai jab forecast mein lagbhag 1 cm ya usse zyada barf ho, aur halki barf ke liye barf ho sakti hai ka nishan. Ole ki chetavani tab aati hai jab forecast mein ole ke saath toofan ho. Yeh had is guide ke liye rakhi gayi hain, SKUAST-K se nahi li gayi. Forecast galat ho sakte hain aur ole bahut chhote ilake mein padte hain, isliye aasman dekhein aur bagwani officer se poochhein.",
+"How do the weather reminders work?": "Mausam ke reminder kaise kaam karte hain?",
+"Turn them on in Settings. When you open the guide, your phone shows a notification if the forecast says it might rain (1 mm or more), snow, hail or frost today. The guide cannot send an alert while it is closed, because it has no server. If you installed it as an app, some Android phones also check in the morning, but the phone decides if and when.": "Settings mein inhe chalu karein. Jab aap guide kholte hain, to agar forecast kehta hai ki aaj baarish (1 mm ya zyada), barf, ole ya frost ho sakta hai, to aapka phone notification dikhata hai. Guide band hone par alert nahi bhej sakti, kyunki ismein koi server nahi hai. Agar aapne ise app ki tarah install kiya hai, to kuch Android phone subah bhi check karte hain, par kab karna hai yeh phone tay karta hai.",
+"Heavy snow can break branches. After the snowfall, check your orchard and ask your horticulture officer what to do.": "Zyada barf se daaliyan toot sakti hain. Barf girne ke baad apna bagh dekhein aur bagwani officer se poochhein ki kya karna hai.",
+"Snow possible.": "Barf girne ki sambhavna hai.",
+"Weather reminder": "Mausam reminder",
+"Get a phone notification when it might rain, snow, frost or hail today. It shows when you open the guide. On some Android phones with the guide installed as an app, it may also check in the morning, but the phone decides when.": "Jab aaj baarish, barf, frost ya ole ho sakte hon, to phone par notification payein. Yeh guide kholne par dikhta hai. Kuch Android phone par, agar guide app ki tarah install hai, to yeh subah bhi check kar sakta hai, par kab karna hai yeh phone tay karta hai.",
+"Turn on reminders": "Reminder chalu karein",
+"Turn off reminders": "Reminder band karein",
+"Send a test reminder": "Test reminder bhejein",
+"Test reminder sent.": "Test reminder bhej diya gaya.",
+"This browser cannot show notifications. On iPhone, add the guide to the Home Screen first, then try again.": "Yeh browser notification nahi dikha sakta. iPhone par pehle guide ko Home Screen par jodein, phir dobara koshish karein.",
+"Notifications are blocked for this site. Allow them in your browser’s site settings, then try again.": "Is site ke liye notification band hain. Browser ki site settings mein inhe allow karein, phir dobara koshish karein.",
+"On. When you open the guide, you get a reminder if rain, snow, frost or hail is forecast for today.": "Chalu hai. Jab aap guide kholte hain, to agar aaj baarish, barf, frost ya ole ka forecast ho, to aapko reminder milta hai.",
+"Weather reminders": "Mausam reminder",
+"Reminders are optional and off until you turn them on. The notification is shown by your phone. If you turn them on, your chosen place is kept on this phone so that it can check the forecast, which is sent to Open-Meteo like the normal forecast. Nothing is sent to any other server.": "Reminder vaikalpik hain aur jab tak aap chalu na karein band rehte hain. Notification aapka phone dikhata hai. Chalu karne par aapki chuni hui jagah is phone mein rakhi jati hai taaki woh forecast check kar sake, jo normal forecast ki tarah Open-Meteo ko bheja jata hai. Kisi aur server ko kuch nahi bheja jata.",
 "Weather warnings": "Mausam ki chetavani",
 "Tomorrow": "Kal",
 "In 2 days": "2 din baad",
@@ -19,8 +36,6 @@ const HI={
 "3 to 4 days after your last fungicide spray.": "Aakhri fungicide spray ke 3 se 4 din baad.",
 "Check the Diary": "Diary dekhein",
 "Save your last fungicide in the Diary to count the 10 days.": "10 din ginne ke liye apni aakhri fungicide Diary mein save karein.",
-"How are the frost and hail warnings decided?": "Frost aur ole ki chetavani kaise tay hoti hai?",
-"A frost warning shows when the forecast low is 0°C or below, and a possible-frost note at 2°C or below. These limits were chosen for this guide, not taken from SKUAST-K. The hail warning shows when the forecast has a thunderstorm with hail. Forecasts can be wrong and hail is very local, so look at the sky and ask your horticulture officer.": "Frost ki chetavani tab aati hai jab forecast ka sabse kam taapmaan 0°C ya usse neeche ho, aur frost ho sakta hai ka nishan 2°C ya usse neeche par. Yeh had is guide ke liye rakhi gayi hain, SKUAST-K se nahi li gayi. Ole ki chetavani tab aati hai jab forecast mein ole ke saath toofan ho. Forecast galat ho sakte hain aur ole bahut chhote ilake mein padte hain, isliye aasman dekhein aur bagwani officer se poochhein.",
 "How does the next spray card work?": "Agli spray ka card kaise kaam karta hai?",
 "It counts the days from the sprays you save in the Diary and shows the waiting rules from the guide: 10 days after a fungicide at flowering, and 3 to 4 days between an insecticide and a fungicide. It does not know about sprays you did not save. Rain still decides whether a fungicide is needed: see the Today card.": "Yeh Diary mein save ki gayi spray se din ginta hai aur guide ke intezaar ke niyam dikhata hai: phool aane par fungicide ke 10 din baad, aur insecticide aur fungicide ke beech 3 se 4 din. Jo spray save nahi ki, uske baare mein ise nahi pata. Fungicide chahiye ya nahi, yeh ab bhi baarish tay karti hai: Today card dekhein.",
 "Skip to content": "Seedhe content par jaayein",
@@ -355,6 +370,7 @@ const HI={
 "Loading…": "Load ho raha hai…"
 };
 const HIP=[
+ [/^Snow expected\. About (\d+) cm\.$/,m=>`Barf girne ka andesha. Lagbhag ${m[1]} cm.`],
  [/^Frost expected\. Low of (-?\d+)°C\.$/,m=>`Frost ka andesha. Sabse kam taapmaan: ${m[1]}°C.`],
  [/^Frost possible near the ground\. Low of (-?\d+)°C\.$/,m=>`Zameen ke paas frost ho sakta hai. Sabse kam taapmaan: ${m[1]}°C.`],
  [/^Last spray: (.+), (today|yesterday|(\d+) days ago)\.$/,m=>`Aakhri spray: ${m[1]}, ${m[2]==="today"?"aaj":m[2]==="yesterday"?"kal":m[3]+" din pehle"}.`],

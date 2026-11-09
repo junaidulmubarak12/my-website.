@@ -50,8 +50,8 @@ function applyLang(){
   ST.forEach((s,i)=>["t","fn","ni","nm","c","x","i","m"].forEach(k=>{const o=hi?ST_HI[i][k]:undefined,e=ST_EN[i][k];if(o!==undefined)s[k]=o;else if(e===undefined)delete s[k];else s[k]=e}));
   KEY.forEach((_,i)=>{KEY[i]=hi&&KEY_HI[i]?KEY_HI[i]:KEY_EN[i]});
 }
-const DEF={size:1,theme:"auto",lang:"en",calm:false,heat:30,tank:100};
-const cleanSet=o=>{o=o&&typeof o==="object"?o:{};return{size:[1,1.15,1.3].includes(+o.size)?+o.size:1,theme:["auto","light","dark"].includes(o.theme)?o.theme:"auto",lang:o.lang==="hi"?"hi":"en",calm:o.calm===true,heat:CL(o.heat,1,60,30),tank:CL(o.tank,1,5000,100)}};
+const DEF={size:1,theme:"auto",lang:"en",calm:false,heat:30,tank:100,remind:false};
+const cleanSet=o=>{o=o&&typeof o==="object"?o:{};return{size:[1,1.15,1.3].includes(+o.size)?+o.size:1,theme:["auto","light","dark"].includes(o.theme)?o.theme:"auto",lang:o.lang==="hi"?"hi":"en",calm:o.calm===true,remind:o.remind===true,heat:CL(o.heat,1,60,30),tank:CL(o.tank,1,5000,100)}};
 let SET=cleanSet(null);try{SET=cleanSet(JSON.parse(localStorage.getItem("apple-settings")))}catch(e){}
 const saveSet=()=>{SET=cleanSet(SET);try{localStorage.setItem("apple-settings",JSON.stringify(SET))}catch(e){}};
 function tr(s){
@@ -105,11 +105,14 @@ function alertsHTML(w){
       if(lo<=0)A.push({k:"stop",t:"frost",i,s:`Frost expected. Low of ${r(lo)}°C.`});
       else if(lo<=2)A.push({k:"wait",t:"frost",i,s:`Frost possible near the ground. Low of ${r(lo)}°C.`});
     }
+    const sn=d.snowfall_sum&&d.snowfall_sum[i];
+    if(typeof sn==="number"&&sn>=1)A.push({k:"stop",t:"snow",i,s:`Snow expected. About ${r(sn)} cm.`});
+    else if((typeof sn==="number"&&sn>=0.1)||[71,73,75,77,85,86].includes(c))A.push({k:"wait",t:"snow",i,s:"Snow possible."});
     if(c===96||c===99)A.push({k:"stop",t:"hail",i,s:"Thunderstorm with hail possible."});
     else if(c===95)A.push({k:"wait",t:"hail",i,s:"Thunderstorm expected. Hail can happen in thunderstorms."});
   }
   if(!A.length)return "";
-  const adv={frost:"Check your orchard early in the morning. Flowers and young fruit are the most at risk. Ask your horticulture officer how to protect them.",hail:"After the storm, check fruit and leaves for damage. Hail wounds can let disease in, so ask your horticulture officer whether a spray is needed."};
+  const adv={frost:"Check your orchard early in the morning. Flowers and young fruit are the most at risk. Ask your horticulture officer how to protect them.",snow:"Heavy snow can break branches. After the snowfall, check your orchard and ask your horticulture officer what to do.",hail:"After the storm, check fruit and leaves for damage. Hail wounds can let disease in, so ask your horticulture officer whether a spray is needed."};
   return `<section class="card alerts" aria-label="Weather warnings"><h3>Weather warnings</h3>${WX&&WX.old?`<p class="m">This is an old forecast. Check again when you have internet.</p>`:""}${A.map(a=>`<div class="al ${a.k}"><b>${L[a.i]}</b><span>${a.s}</span></div>`).join("")}${[...new Set(A.map(a=>a.t))].map(k=>`<p class="m">${adv[k]}</p>`).join("")}</section>`;
 }
 function sprayCat(p){
@@ -266,7 +269,7 @@ function cleanWx(j){
     if(typeof c.time!=="string"||!DT.test(c.time))throw 0;
     return{current:{time:c.time,temperature_2m:N(c.temperature_2m),relative_humidity_2m:N(c.relative_humidity_2m),precipitation:N(c.precipitation),weather_code:N(c.weather_code),wind_speed_10m:N(c.wind_speed_10m)},
       hourly:{time:tt(h.time),precipitation:nn(h.precipitation,400)},
-      daily:{time:tt(d.time).slice(0,7),precipitation_sum:nn(d.precipitation_sum,7),temperature_2m_max:nn(d.temperature_2m_max,7),temperature_2m_min:nz(d.temperature_2m_min,7),weather_code:nz(d.weather_code,7),sunrise:tt(d.sunrise).slice(0,7),sunset:tt(d.sunset).slice(0,7)}};
+      daily:{time:tt(d.time).slice(0,7),precipitation_sum:nn(d.precipitation_sum,7),temperature_2m_max:nn(d.temperature_2m_max,7),temperature_2m_min:nz(d.temperature_2m_min,7),weather_code:nz(d.weather_code,7),snowfall_sum:nz(d.snowfall_sum,7),sunrise:tt(d.sunrise).slice(0,7),sunset:tt(d.sunset).slice(0,7)}};
   }catch(e){return null}
 }
 function wxIn(w){
@@ -311,6 +314,7 @@ function fillWx(){
   if($("htiles"))$("htiles").innerHTML=tilesHTML(w);
   if($("hrain"))$("hrain").innerHTML=rainHTML(w);
   if($("alerts"))$("alerts").innerHTML=alertsHTML(w);
+  if(w)maybeNotify(w);
   if($("today"))$("today").innerHTML=todayHTML(w);
   if($("wmini"))$("wmini").innerHTML=miniHTML(w);
   if(w&&$("wr")){const x=wxIn(w);$("wr").value=x.rain;$("wh").value=x.hot?"1":"0";$("ww").value=x.wet?"1":"0"}
@@ -324,7 +328,7 @@ function ensureWx(){
 async function loadWx(){
   const p=PLACE;LOAD=true;ERR=false;fillWx();
   try{
-    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=precipitation&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&forecast_days=7&timezone=auto`,{signal:AbortSignal.timeout?AbortSignal.timeout(10000):undefined});
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&hourly=precipitation&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,weather_code,snowfall_sum,sunrise,sunset&forecast_days=7&timezone=auto`,{signal:AbortSignal.timeout?AbortSignal.timeout(10000):undefined});
     if(!r.ok)throw new Error("bad response");
     const cj=cleanWx(await r.json());if(!cj)throw new Error("bad data");
     WX={j:cj,k:p.lat+","+p.lon,t:Date.now()};
@@ -394,6 +398,7 @@ function settingsHTML(){
   ${row("My place for the weather",PLACE?esc(PLACE.name):"Not chosen yet",`<div class="wh"><button class="pill alt" data-g="wx">Change</button>${PLACE?`<button class="pill alt" data-a="forgetplace">Forget</button>`:""}</div>`)}
   ${row("Spray tank size (litres)","The guide gives doses per 100 litres. Enter your tank size and the Weather page works out the dose for it.",`<input id="st-tank" type="number" min="1" value="${+SET.tank}">`)}
   ${row("Hot weather limit (°C)","The guide says not to spray in high heat but gives no number. The recommended starting value is 30°C. Ask your expert and change it here.",`<input id="st-heat" type="number" min="1" value="${+SET.heat}">`)}
+  ${row("Weather reminder","Get a phone notification when it might rain, snow, frost or hail today. It shows when you open the guide. On some Android phones with the guide installed as an app, it may also check in the morning, but the phone decides when.",`<div class="wh"><button class="pill${remindOn()?" alt":""}" data-x="remind">${remindOn()?"Turn off reminders":"Turn on reminders"}</button>${remindOn()?`<button class="pill alt" data-x="remindtest">Send a test reminder</button>`:""}</div>${remindStat()}`)}
   ${row("Welcome guide","Show the short introduction again.",`<div class="wh"><button class="pill alt" data-a="rewelcome">Show again</button></div>`)}
   ${row("My data","Spray diary entries and settings are stored only on this phone.",`<div class="wh"><button class="pill alt" data-a="cleardiary">Clear spray diary</button><button class="pill alt" data-a="resetset">Reset settings</button></div>`)}
   </div>`;
@@ -444,6 +449,7 @@ function privacyView(){
   return `<div class="pn"><button data-g="set">Back to Settings</button></div><h1>Privacy</h1>
   <div class="sec"><h3>What stays on your phone</h3><p>Your settings, your spray diary, the place you choose and the last weather forecast are saved on your phone only. You can delete them any time in Settings, under My data.</p></div>
   <div class="sec"><h3>Weather and your location</h3><p>To show the weather, this guide sends the coordinates of your chosen place to Open-Meteo (open-meteo.com), which can see your internet address. If you tap Use my location, your phone shares its position with this page. It is used only to get the weather and is saved on your phone, rounded to about 100 metres.</p></div>
+  <div class="sec"><h3>Weather reminders</h3><p>Reminders are optional and off until you turn them on. The notification is shown by your phone. If you turn them on, your chosen place is kept on this phone so that it can check the forecast, which is sent to Open-Meteo like the normal forecast. Nothing is sent to any other server.</p></div>
   <div class="sec"><h3>Fonts</h3><p>The page loads its text font from Google Fonts, so Google can see your internet address when the font is first downloaded.</p></div>
   <div class="sec"><h3>Accounts</h3><p>${ON?"If you create an account, your email address, your name and your spray diary are stored with Google Firebase. Your password is handled by Firebase and is never seen by this guide. You can delete the account and the online data in Settings. Logging out keeps a copy of your diary on this phone.":"Accounts are not switched on yet. When they are, this page will explain what is stored."}</p></div>
   <div class="sec"><h3>What this guide does not do</h3><p>It has no advertisements, no tracking and no analytics, and it does not sell or share your information.</p></div>
@@ -626,7 +632,7 @@ function render(){
   const on=document.querySelector(".chip.on"),sp=$("strip");
   if(on&&sp)sp.scrollLeft=on.offsetLeft-sp.clientWidth/2+on.clientWidth/2;
   endSplash();
-  $("top").hidden=!WELCOMED;{const tt=TABS.find(x=>x[0]===tab);document.title=(WELCOMED&&tab!=="stage"&&tt?tr(tt[1])+" | ":"")+"Kashmir Apple Guide"}if(typeof onScroll==="function")onScroll();
+  $("top").hidden=!WELCOMED;{const tt=TABS.find(x=>x[0]===tab);document.title=(WELCOMED&&tab!=="stage"&&tt?tr(tt[1])+" | ":"")+"Kashmir Apple Guide"}if(typeof onScroll==="function")onScroll();if(typeof remindStore==="function")remindStore();
 }
 
 document.addEventListener("click",e=>{
@@ -640,7 +646,7 @@ document.addEventListener("click",e=>{
   else if(d.set){const k=d.set,v=d.v;SET[k]=k==="size"?+v:k==="calm"?v==="1":v;saveSet();applySet()}
   else if(d.a==="forgetplace"){PLACE=null;WX=null;try{localStorage.removeItem("apple-place")}catch(x){}}
   else if(d.a==="cleardiary"){ask(tr("Delete all your saved sprays?"),"Delete all").then(ok=>{if(!ok)return;D.forEach(g=>g.id&&TOMB.push(g.id));store("apple-tomb",TOMB);D=[];saveD();if(AUTH)sync();ANIM=false;render()});return}
-  else if(d.a==="resetset"){ask(tr("Reset all settings?"),"Reset").then(ok=>{if(!ok)return;SET={...DEF};TANK=SET.tank;saveSet();applySet();ANIM=false;render()});return}
+  else if(d.a==="resetset"){ask(tr("Reset all settings?"),"Reset").then(ok=>{if(!ok)return;SET={...DEF};TANK=SET.tank;saveSet();applySet();remindStop();ANIM=false;render()});return}
   else if(["login","signup","forgot","saveprof","delacc"].includes(d.a)){acct(d.a);return}
   else if(d.a==="syncnow"){sync();return}
   else if(d.a==="logout"){AUTH=null;store("apple-auth",null);SYNC=""}
@@ -672,7 +678,8 @@ const FAQS=[
 ["Where is my diary saved?","On this phone. It does not move to another phone or web address by itself. Clearing your browser data deletes it, so use “Copy diary” on the Diary page if you want a backup."],
 ["How do I install it on my phone?","Android: open the Chrome menu, then Install app. iPhone: tap Share, then Add to Home Screen. It then opens like an app."],
 ["Why is the hot weather limit 30°C?","The guide says not to spray in high heat but gives no number. 30°C is a starting value chosen for this guide, not from SKUAST-K. Ask your expert and change it in Settings."],
-["How are the frost and hail warnings decided?","A frost warning shows when the forecast low is 0°C or below, and a possible-frost note at 2°C or below. These limits were chosen for this guide, not taken from SKUAST-K. The hail warning shows when the forecast has a thunderstorm with hail. Forecasts can be wrong and hail is very local, so look at the sky and ask your horticulture officer."],
+["How are the frost, hail and snow warnings decided?","A frost warning shows when the forecast low is 0°C or below, and a possible-frost note at 2°C or below. A snow warning shows when the forecast has about 1 cm of snow or more, and a possible-snow note for lighter snow. The hail warning shows when the forecast has a thunderstorm with hail. These limits were chosen for this guide, not taken from SKUAST-K. Forecasts can be wrong and hail is very local, so look at the sky and ask your horticulture officer."],
+["How do the weather reminders work?","Turn them on in Settings. When you open the guide, your phone shows a notification if the forecast says it might rain (1 mm or more), snow, hail or frost today. The guide cannot send an alert while it is closed, because it has no server. If you installed it as an app, some Android phones also check in the morning, but the phone decides if and when."],
 ["How does the next spray card work?","It counts the days from the sprays you save in the Diary and shows the waiting rules from the guide: 10 days after a fungicide at flowering, and 3 to 4 days between an insecticide and a fungicide. It does not know about sprays you did not save. Rain still decides whether a fungicide is needed: see the Today card."],
 ["Is it free? Are there advertisements?","It is free. It sells nothing and has no advertisements."]];
 function faqHTML(){return `<div class="sec" id="faq"><h3>Common questions</h3>${FAQS.map(f=>`<details><summary>${esc(f[0])}</summary><p>${esc(f[1])}</p></details>`).join("")}</div>`}
@@ -765,12 +772,62 @@ document.addEventListener("click",e=>{
   if(x==="print"){window.print();return}
   if(x==="copy"){const el=$(b.dataset.for);doCopy(b,el?el.innerText:"");return}
   if(x==="copydia"){doCopy(b,diaText());return}
+  if(x==="remind"){remindToggle();return}
+  if(x==="remindtest"){showRemind([REMIND.test(SET.lang)],true).catch(()=>{});say("Test reminder sent.");return}
   if(x==="notice"){hideNote=true;try{localStorage.setItem("apple-notice","1")}catch(z){}ANIM=false;render();return}
   if(x==="pw"){const i=$("ac-pass");if(!i)return;const show=i.type==="password";i.type=show?"text":"password";b.textContent=show?"Hide":"Show";b.setAttribute("aria-pressed",show?"true":"false");b.setAttribute("aria-label",show?"Hide password":"Show password")}
 });
 document.addEventListener("input",e=>{if(e.target.getAttribute&&e.target.getAttribute("aria-invalid"))e.target.removeAttribute("aria-invalid")});
 addEventListener("beforeprint",()=>document.querySelectorAll("#v details").forEach(d=>{d.dataset.was=d.open?"1":"0";d.open=true}));
 addEventListener("afterprint",()=>document.querySelectorAll("#v details").forEach(d=>{d.open=d.dataset.was==="1"}));
+
+
+/* ---------- Weather reminders (phone notifications) ---------- */
+var RSTAT="",RSIG="";
+function remindCan(){return "Notification" in window&&"serviceWorker" in navigator&&/^https?:$/.test(location.protocol)}
+function remindOn(){return !!SET.remind&&remindCan()&&Notification.permission==="granted"}
+function remindStat(){
+  let k="",x="";
+  if(RSTAT==="unsupported"||!remindCan()&&RSTAT){k="err";x="This browser cannot show notifications. On iPhone, add the guide to the Home Screen first, then try again."}
+  else if(RSTAT==="blocked"||(SET.remind&&remindCan()&&Notification.permission!=="granted")){k="err";x="Notifications are blocked for this site. Allow them in your browser’s site settings, then try again."}
+  else if(remindOn()){k="ok";x="On. When you open the guide, you get a reminder if rain, snow, frost or hail is forecast for today."}
+  return x?`<p class="msg ${k}" role="status">${x}</p>`:"";
+}
+async function showRemind(msgs,test){
+  const reg=await navigator.serviceWorker.ready;
+  await reg.showNotification(REMIND.title(),{body:msgs.join(" "),icon:"icon-192.png",badge:"icon-192.png",tag:test?"weather-test":"weather-today",lang:SET.lang==="hi"?"hi":"en"});
+}
+function maybeNotify(w){
+  if(!remindOn()||!w||(WX&&WX.old))return;
+  const m=REMIND.messages(w.daily,SET.lang);if(!m.length)return;
+  const key=new Date().toDateString()+"|"+m.join("|");
+  let last="";try{last=localStorage.getItem("apple-notified")||""}catch(e){}
+  if(last===key)return;
+  try{localStorage.setItem("apple-notified",key)}catch(e){}
+  showRemind(m).catch(()=>{});
+}
+async function remindStore(){
+  if(!remindOn()||!PLACE||!window.caches)return;
+  const sig=PLACE.lat+","+PLACE.lon+","+SET.lang;if(sig===RSIG)return;RSIG=sig;
+  try{const c=await caches.open("apple-remind");await c.put("remind.json",new Response(JSON.stringify({lat:PLACE.lat,lon:PLACE.lon,lang:SET.lang}),{headers:{"Content-Type":"application/json"}}))}catch(e){}
+}
+async function remindStop(){
+  RSIG="";try{localStorage.removeItem("apple-notified")}catch(e){}
+  try{const reg=await navigator.serviceWorker.ready;if(reg.periodicSync)await reg.periodicSync.unregister("weather")}catch(e){}
+  try{await caches.delete("apple-remind")}catch(e){}
+}
+async function remindToggle(){
+  ANIM=false;
+  if(SET.remind){SET.remind=false;saveSet();RSTAT="";await remindStop();render();return}
+  if(!remindCan()){RSTAT="unsupported";render();return}
+  let p="denied";try{p=await Notification.requestPermission()}catch(e){}
+  if(p!=="granted"){RSTAT="blocked";render();return}
+  SET.remind=true;saveSet();RSTAT="";
+  try{const reg=await navigator.serviceWorker.ready;if(reg.periodicSync)await reg.periodicSync.register("weather",{minInterval:12*3600*1000})}catch(e){}
+  await remindStore();
+  render();
+  if(WX&&PLACE&&WX.k===PLACE.lat+","+PLACE.lon)maybeNotify(WX.j);
+}
 
 render();
 if(AUTH)sync();
